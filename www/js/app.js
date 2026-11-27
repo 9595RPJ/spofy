@@ -61,10 +61,14 @@ class RitmoApp {
     this.pendingPlaylistCoverFile = null;
     this.pendingAudioCoverFile = null;
     this.detectedAudioDuration = 210;
-    this.isListenerMode = false; // false = Admin/Editor (You), true = Listener Preview (How others see it)
+    this.isListenerMode = true; // Always start in clean User (Listener) mode by default!
+    this.secretPin = '1234';
+    this.avatarTapCount = 0;
+    this.avatarTapTimer = null;
   }
 
   async init() {
+    document.body.classList.add('listener-mode');
     await window.storageEngine.init();
     this.loadLocalState();
     await this.syncFromSupabaseOnStartup();
@@ -960,25 +964,57 @@ class RitmoApp {
       }
     });
 
-    // Toggle Admin/Editor Mode vs Listener Mode (How others see the player)
-    document.getElementById('btn-toggle-view-mode').addEventListener('click', () => {
-      this.isListenerMode = !this.isListenerMode;
-      document.body.classList.toggle('listener-mode', this.isListenerMode);
-      const btn = document.getElementById('btn-toggle-view-mode');
-      const label = document.getElementById('view-mode-label');
-
-      if (this.isListenerMode) {
-        btn.classList.add('listener');
-        label.textContent = '🎧 Vista Oyente';
-        this.switchCreateSubTab('playlist');
-        this.showToast('Modo Oyente: Así ven la app los demás usuarios 👀');
-      } else {
-        btn.classList.remove('listener');
-        label.textContent = '🛠️ Modo Editor';
-        this.showToast('Modo Editor: Controles de subida y Supabase activos 🛠️');
+    // Secret 5-tap on Avatar J to open PIN (1234) unlock modal
+    const handleAvatarSecretTap = () => {
+      if (!this.isListenerMode) {
+        document.getElementById('cloud-modal').classList.add('open');
+        return;
       }
-      this.renderLibrary();
+      this.avatarTapCount++;
+      clearTimeout(this.avatarTapTimer);
+      this.avatarTapTimer = setTimeout(() => {
+        this.avatarTapCount = 0;
+      }, 2200);
+
+      if (this.avatarTapCount >= 5) {
+        this.avatarTapCount = 0;
+        const pinInput = document.getElementById('admin-pin-input');
+        pinInput.value = '';
+        document.getElementById('pin-modal').classList.add('open');
+        setTimeout(() => pinInput.focus(), 100);
+      }
+    };
+
+    const unlockEditorWithPin = () => {
+      const pinInput = document.getElementById('admin-pin-input');
+      if (pinInput.value.trim() === this.secretPin) {
+        this.isListenerMode = false;
+        document.body.classList.remove('listener-mode');
+        document.getElementById('pin-modal').classList.remove('open');
+        this.renderLibrary();
+        this.showToast('🔓 Modo Editor desbloqueado');
+      } else {
+        pinInput.value = '';
+        this.showToast('❌ PIN incorrecto');
+      }
+    };
+
+    document.getElementById('btn-submit-pin').addEventListener('click', unlockEditorWithPin);
+    document.getElementById('admin-pin-input').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') unlockEditorWithPin();
     });
+    document.getElementById('btn-close-pin-modal').addEventListener('click', () => {
+      document.getElementById('pin-modal').classList.remove('open');
+    });
+
+    document.getElementById('btn-lock-admin-mode').addEventListener('click', () => {
+      this.isListenerMode = true;
+      document.body.classList.add('listener-mode');
+      this.switchCreateSubTab('playlist');
+      this.renderLibrary();
+      this.showToast('🔒 Modo Editor bloqueado (Vista Usuario)');
+    });
+    this._handleAvatarSecretTap = handleAvatarSecretTap;
 
     // Mini-Player & Full-Player Controls
     document.getElementById('mini-open-full').addEventListener('click', () => {
@@ -1059,8 +1095,8 @@ class RitmoApp {
     const closeCloudModal = () => document.getElementById('cloud-modal').classList.remove('open');
 
     document.getElementById('btn-cloud-settings').addEventListener('click', openCloudModal);
-    document.getElementById('user-avatar-btn').addEventListener('click', openCloudModal);
-    document.getElementById('search-avatar-btn').addEventListener('click', openCloudModal);
+    document.getElementById('user-avatar-btn').addEventListener('click', () => this._handleAvatarSecretTap());
+    document.getElementById('search-avatar-btn').addEventListener('click', () => this._handleAvatarSecretTap());
     document.getElementById('btn-open-cloud-from-create').addEventListener('click', openCloudModal);
     document.getElementById('btn-close-cloud-modal').addEventListener('click', closeCloudModal);
 
