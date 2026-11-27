@@ -1,0 +1,8 @@
+{
+  "appId": "com.jaasiel.spofy",
+  "appName": "Spofy",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  }
+}
