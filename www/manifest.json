@@ -1,0 +1,18 @@
+{
+  "name": "Spofy",
+  "short_name": "Spofy",
+  "description": "Spofy - Tu música, a tu ritmo",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0a0a0c",
+  "theme_color": "#e52535",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://jmtdskkkximvhbtxgunp.supabase.co/storage/v1/object/public/audios/covers/junior_h_las_noches.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    }
+  ]
+}
