@@ -13,7 +13,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css" />
 </head>
-<body>
+<body class="listener-mode">
   <div class="app-shell">
     <!-- Toast Notification -->
     <div id="toast" class="toast">Listo</div>
@@ -24,12 +24,12 @@
       <section id="screen-home" class="screen active">
         <header class="top-bar">
           <div class="user-greeting">
-            <div class="avatar-circle" id="user-avatar-btn" title="Configuración de Nube y Perfil">J</div>
+            <div class="avatar-circle" id="user-avatar-btn" title="Spofy">J</div>
             <span class="greeting-text" id="greeting-name">Hola, Jaasiel</span>
           </div>
           <div class="top-actions">
-            <button class="mode-toggle-btn" id="btn-toggle-view-mode" title="Cambiar entre Vista Editor (Tú) y Vista Oyente (Cómo lo ven los demás)">
-              <span id="view-mode-label">🛠️ Modo Editor</span>
+            <button class="mode-toggle-btn admin-only" id="btn-lock-admin-mode" title="Salir del Modo Editor y volver a Vista de Usuario">
+              <span>🔒 Bloquear Editor</span>
             </button>
             <button class="icon-btn admin-only" id="btn-open-upload-quick" title="Subir Audio">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
@@ -455,6 +455,23 @@
             <input type="file" id="input-import-catalog" accept=".json" hidden />
           </label>
         </div>
+      </div>
+    </div>
+
+    <!-- ==================== SECRET ADMIN PIN MODAL ==================== -->
+    <div class="modal-overlay" id="pin-modal">
+      <div class="modal-sheet" style="max-width: 340px; margin: auto; border-radius: 24px; border: 1px solid rgba(229,37,53,0.35); padding: 22px 20px;">
+        <div class="section-header" style="margin-bottom: 8px;">
+          <h3 class="section-title">🔐 Acceso Administrador</h3>
+          <button class="icon-btn" id="btn-close-pin-modal">✕</button>
+        </div>
+        <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 14px;">
+          Ingresa tu PIN secreto para activar el Modo Editor y subir o administrar canciones en Supabase.
+        </p>
+        <div class="form-group">
+          <input type="password" id="admin-pin-input" inputmode="numeric" maxlength="8" class="form-input" placeholder="••••" style="text-align: center; font-size: 22px; letter-spacing: 8px; font-weight: 800;" />
+        </div>
+        <button class="btn-primary-red" id="btn-submit-pin">Desbloquear Modo Editor</button>
       </div>
     </div>
   </div>
