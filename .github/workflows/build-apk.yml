@@ -30,7 +30,7 @@ jobs:
           npx cap add android
           npx cap sync android
 
-      - name: Apply Custom Bulby App Icon to Android APK
+      - name: Apply Custom Bulby App Icon & Microphone Permission to Android APK
         run: |
           for dir in android/app/src/main/res/mipmap-*; do
             if [ -d "$dir" ]; then
@@ -40,6 +40,7 @@ jobs:
             fi
           done
           rm -rf android/app/src/main/res/mipmap-anydpi-v26 || true
+          sed -i 's/<uses-permission android:name="android.permission.INTERNET" \/>/<uses-permission android:name="android.permission.INTERNET" \/>\n    <uses-permission android:name="android.permission.RECORD_AUDIO" \/>\n    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" \/>/' android/app/src/main/AndroidManifest.xml || true
 
       - name: Build Debug APK
         working-directory: ./android
