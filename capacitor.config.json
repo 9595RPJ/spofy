@@ -3,6 +3,8 @@
   "appName": "Spofy",
   "webDir": "www",
   "server": {
+    "url": "https://9595rpj.github.io/spofy/www/index.html",
+    "cleartext": true,
     "androidScheme": "https"
   }
 }
