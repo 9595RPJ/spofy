@@ -16,6 +16,8 @@ class StorageEngine {
       supabaseUrl: 'https://jmtdskkkximvhbtxgunp.supabase.co',
       supabaseAnonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImptdGRza2treGltdmhidHhndW5wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTU3NTI2NTYsImV4cCI6MjExMTMyODY1Nn0.pFKROneHRfVrhChjtfgVIjzQjQ9HfPcXZzQkHMnX6Ik',
       supabaseBucket: 'audios',
+      driveBridgeUrl: 'https://jmtdskkkximvhbtxgunp.supabase.co/functions/v1/drive-bridge',
+      driveFolderId: '1LpYg2iJXAFUXGxvjdbt-2qLd9YV6Qa8b',
       cloudinaryCloudName: '',
       cloudinaryUploadPreset: '',
       userName: 'Jaasiel'
@@ -232,6 +234,38 @@ class StorageEngine {
       provider: 'supabase',
       createdAt: r.created_at
     }));
+  }
+
+  // Fetch and auto-sync tracks directly from the user's 1 TB Google Drive Folder via the Secure Supabase Bridge
+  async fetchTracksFromGoogleDriveBridge() {
+    const bridgeUrl = this.config.driveBridgeUrl || 'https://jmtdskkkximvhbtxgunp.supabase.co/functions/v1/drive-bridge';
+    const folderId = this.config.driveFolderId || '1LpYg2iJXAFUXGxvjdbt-2qLd9YV6Qa8b';
+    const res = await fetch(`${bridgeUrl}?action=list&folderId=${encodeURIComponent(folderId)}`);
+    if (!res.ok) throw new Error('No se pudo consultar el puente de Google Drive');
+    const data = await res.json();
+    const driveTracks = data.tracks || [];
+
+    // Also persist any newly discovered Drive track metadata into Supabase Postgres table
+    for (const dt of driveTracks) {
+      await this.syncTrackToSupabase(dt);
+    }
+    return driveTracks;
+  }
+
+  // Convert any pasted Google Drive file link or ID into a hidden Supabase Bridge streaming URL
+  buildDriveBridgeTrackUrls(driveLinkOrId) {
+    const bridgeUrl = this.config.driveBridgeUrl || 'https://jmtdskkkximvhbtxgunp.supabase.co/functions/v1/drive-bridge';
+    let fileId = driveLinkOrId.trim();
+    const matchD = fileId.match(/\/d\/([a-zA-Z0-9_-]{15,})/);
+    const matchId = fileId.match(/[?&]id=([a-zA-Z0-9_-]{15,})/);
+    if (matchD) fileId = matchD[1];
+    else if (matchId) fileId = matchId[1];
+
+    return {
+      fileId,
+      audioUrl: `${bridgeUrl}?action=stream&id=${encodeURIComponent(fileId)}`,
+      coverUrl: `${bridgeUrl}?action=cover&id=${encodeURIComponent(fileId)}`
+    };
   }
 
   // Download a cloud audio track to IndexedDB for offline listening
