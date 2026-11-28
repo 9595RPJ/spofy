@@ -227,10 +227,10 @@ class StorageEngine {
       album: r.album,
       category: r.category || 'Música',
       genre: r.genre || 'Rock',
-      audioUrl: r.audio_url,
-      coverUrl: r.cover_url,
+      audioUrl: (r.audio_url || '').replace('http://jmtdskkkximvhbtxgunp.supabase.co/drive-bridge', 'https://jmtdskkkximvhbtxgunp.supabase.co/functions/v1/drive-bridge'),
+      coverUrl: (r.cover_url || '').replace('http://jmtdskkkximvhbtxgunp.supabase.co/drive-bridge', 'https://jmtdskkkximvhbtxgunp.supabase.co/functions/v1/drive-bridge'),
       duration: r.duration || 210,
-      liked: r.liked,
+      liked: Boolean(r.liked),
       provider: 'supabase',
       createdAt: r.created_at
     }));
