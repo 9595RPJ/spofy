@@ -8,6 +8,53 @@ class BulbyAssistant {
       mx: null,
       us: null
     };
+    // Custom Bulby sound effect slots (ready for user's custom audio files in assets/sounds/)
+    this.customSounds = {
+      greet: 'assets/sounds/bulby-greet.mp3',
+      listen: 'assets/sounds/bulby-listen.mp3',
+      reply: 'assets/sounds/bulby-reply.mp3',
+      happy: 'assets/sounds/bulby-happy.mp3'
+    };
+    this.sfxPlayer = new Audio();
+  }
+
+  // Play Bulby sound effect (uses user's custom audio file if present, or gentle synth chime fallback)
+  async playBulbySound(type = 'reply') {
+    const customUrl = this.customSounds[type];
+    if (customUrl) {
+      try {
+        const res = await fetch(customUrl, { method: 'HEAD' });
+        if (res.ok) {
+          this.sfxPlayer.src = customUrl;
+          this.sfxPlayer.volume = 0.85;
+          await this.sfxPlayer.play();
+          return;
+        }
+      } catch (e) {}
+    }
+    // Gentle soft synth chirp until user provides custom Bulby audio files
+    try {
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      if (!Ctx) return;
+      const ctx = new Ctx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      const now = ctx.currentTime;
+      if (type === 'listen') {
+        osc.frequency.setValueAtTime(520, now);
+        osc.frequency.exponentialRampToValueAtTime(780, now + 0.14);
+      } else {
+        osc.frequency.setValueAtTime(640, now);
+        osc.frequency.exponentialRampToValueAtTime(920, now + 0.12);
+      }
+      gain.gain.setValueAtTime(0.08, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.16);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.17);
+    } catch (e) {}
   }
 
   // Fetch live Top Songs Chart for a country ('mx' = Mexico, 'us' = Global/International)
