@@ -100,10 +100,23 @@ class SpofyApp {
   async syncFromSupabaseOnStartup() {
     if (!window.storageEngine.config.supabaseUrl || !window.storageEngine.config.supabaseAnonKey) return;
     try {
+      const byId = new Map();
+      // 1. Fetch tracks stored in Supabase table
       const remoteTracks = await window.storageEngine.fetchTracksFromSupabase();
       if (remoteTracks && remoteTracks.length) {
-        const byId = new Map();
         remoteTracks.forEach((rt) => byId.set(rt.id, rt));
+      }
+      // 2. Also auto-discover any tracks inside the user's 1 TB Google Drive Folder via the Secure Bridge
+      try {
+        const driveTracks = await window.storageEngine.fetchTracksFromGoogleDriveBridge();
+        if (driveTracks && driveTracks.length) {
+          driveTracks.forEach((dt) => byId.set(dt.id, dt));
+        }
+      } catch (driveErr) {
+        console.warn('Drive folder startup check:', driveErr.message);
+      }
+
+      if (byId.size > 0) {
         this.tracks.forEach((lt) => {
           if (!byId.has(lt.id)) byId.set(lt.id, lt);
         });
@@ -917,27 +930,78 @@ class SpofyApp {
         • <b>Álbum:</b> ${meta.album || '—'} · <b>Duración:</b> ${this.formatTime(this.detectedAudioDuration)}`;
     });
 
+    // Manual 1-Tap Google Drive 1 TB Folder Sync button
+    const syncDriveBtn = document.getElementById('btn-sync-gdrive-folder');
+    if (syncDriveBtn) {
+      syncDriveBtn.addEventListener('click', async () => {
+        syncDriveBtn.disabled = true;
+        syncDriveBtn.textContent = '🔄 Escaneando carpeta de Google Drive...';
+        try {
+          const driveTracks = await window.storageEngine.fetchTracksFromGoogleDriveBridge();
+          if (!driveTracks.length) {
+            this.showToast('La carpeta de Drive está vacía por ahora. ¡Sube un .mp3 o .flac ahí!');
+          } else {
+            const existingIds = new Set(this.tracks.map((t) => t.id));
+            let added = 0;
+            driveTracks.forEach((dt) => {
+              if (!existingIds.has(dt.id)) {
+                this.tracks.unshift(dt);
+                added++;
+              }
+            });
+            this.queue = [...this.tracks];
+            this.saveLocalState();
+            await this.renderAll();
+            this.showToast(`¡${driveTracks.length} canciones de Drive sincronizadas (${added} nuevas)! 🎉`);
+          }
+        } catch (err) {
+          this.showToast(`Error al sincronizar Drive: ${err.message}`);
+        } finally {
+          syncDriveBtn.disabled = false;
+          syncDriveBtn.textContent = '🔄 Sincronizar canciones de mi Carpeta de Drive ahora';
+        }
+      });
+    }
+
     document.getElementById('btn-submit-audio').addEventListener('click', async () => {
       const fileInput = document.getElementById('audio-file-input');
+      const gdriveInput = document.getElementById('audio-gdrive-link-input');
       const file = fileInput.files[0];
-      if (!file) {
-        this.showToast('Selecciona un archivo de audio (.flac, .mp3, .wav)');
+      const gdriveLink = gdriveInput ? gdriveInput.value.trim() : '';
+
+      if (!file && !gdriveLink) {
+        this.showToast('Selecciona un archivo de audio o pega un enlace de Google Drive');
         return;
       }
 
       const btn = document.getElementById('btn-submit-audio');
-      const title = document.getElementById('audio-title-input').value.trim() || file.name;
+      const title = document.getElementById('audio-title-input').value.trim() || (file ? file.name : 'Canción de Drive');
       const artist = document.getElementById('audio-artist-input').value.trim() || 'Artista';
-      const album = document.getElementById('audio-album-input').value.trim() || 'Sencillo';
+      const album = document.getElementById('audio-album-input').value.trim() || 'Google Drive 1TB';
       const genre = document.getElementById('audio-genre-input').value;
       const duration = this.detectedAudioDuration || 210;
 
       btn.disabled = true;
-      btn.textContent = 'Subiendo a Supabase Cloud...';
+      btn.textContent = 'Guardando en nube...';
 
       try {
-        const audioUpload = await window.storageEngine.uploadFile(file, 'tracks');
+        let audioUrl = '';
+        let blobId = null;
         let coverUrl = 'assets/app-icon.png';
+        let provider = 'supabase';
+
+        if (gdriveLink && !file) {
+          const bridgeInfo = window.storageEngine.buildDriveBridgeTrackUrls(gdriveLink);
+          audioUrl = bridgeInfo.audioUrl;
+          coverUrl = bridgeInfo.coverUrl;
+          provider = 'gdrive_bridge';
+        } else {
+          const audioUpload = await window.storageEngine.uploadFile(file, 'tracks');
+          audioUrl = audioUpload.url;
+          blobId = audioUpload.blobId;
+          provider = audioUpload.provider;
+        }
+
         if (this.pendingAudioCoverFile) {
           const coverUpload = await window.storageEngine.uploadFile(this.pendingAudioCoverFile, 'covers');
           coverUrl = coverUpload.url;
@@ -950,12 +1014,12 @@ class SpofyApp {
           album,
           category: 'Música',
           genre,
-          audioUrl: audioUpload.url,
-          blobId: audioUpload.blobId,
+          audioUrl,
+          blobId,
           coverUrl,
           duration,
           liked: true,
-          provider: audioUpload.provider,
+          provider,
           createdAt: new Date().toISOString()
         };
 
@@ -966,6 +1030,7 @@ class SpofyApp {
         this.saveLocalState();
 
         fileInput.value = '';
+        if (gdriveInput) gdriveInput.value = '';
         document.getElementById('audio-title-input').value = '';
         document.getElementById('audio-artist-input').value = '';
         document.getElementById('audio-album-input').value = '';
@@ -977,7 +1042,7 @@ class SpofyApp {
         await this.renderAll();
         await this.loadTrack(0, true);
         this.switchScreen('screen-home');
-        this.showToast(`"${title}" subido a Supabase 🎧`);
+        this.showToast(`"${title}" guardado y reproduciendo 🎧`);
       } catch (err) {
         this.showToast(`Error: ${err.message}`);
       } finally {
