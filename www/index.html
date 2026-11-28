@@ -538,13 +538,16 @@
 
         <button class="btn-primary-emerald" id="btn-save-cloud-cfg" style="margin-bottom: 12px;">Guardar configuración</button>
 
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
           <button class="pill" id="btn-export-catalog" style="text-align:center;">⬇ Exportar Respaldo</button>
           <label class="pill" style="text-align:center; cursor:pointer;">
             ⬆ Importar Respaldo
             <input type="file" id="input-import-catalog" accept=".json" hidden />
           </label>
         </div>
+        <button class="pill" id="btn-force-ota-update" style="width:100%; text-align:center; border-color: var(--accent-lime); color: var(--accent-lime);">
+          🔄 Buscar y aplicar cambios de diseño en vivo (OTA)
+        </button>
       </div>
     </div>
 
