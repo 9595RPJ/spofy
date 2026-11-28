@@ -1382,6 +1382,22 @@ class SpofyApp {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
+  // Register OTA Service Worker so future updates load automatically without reinstalling the APK
+  if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+    navigator.serviceWorker.register('./sw.js').catch((err) => console.warn('SW register note:', err));
+  }
+
+  const otaBtn = document.getElementById('btn-force-ota-update');
+  if (otaBtn) {
+    otaBtn.addEventListener('click', async () => {
+      if ('caches' in window) {
+        const keys = await caches.keys();
+        await Promise.all(keys.map((k) => caches.delete(k)));
+      }
+      window.location.reload(true);
+    });
+  }
+
   window.spofyApp = new SpofyApp();
   window.spofyApp.init();
 });
