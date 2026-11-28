@@ -134,10 +134,13 @@
           </div>
         </div>
 
-        <!-- Tus Canciones en Supabase -->
+        <!-- Tus Canciones en Supabase / Google Drive -->
         <div class="section-header" style="margin-top: 18px;">
           <h3 class="section-title">Tu música en Spofy</h3>
-          <button class="section-link admin-only" id="home-upload-link">+ Subir audio</button>
+          <div style="display:flex; gap: 10px;" class="admin-only">
+            <button class="section-link" id="home-sync-drive-btn">🔄 Sincronizar Drive (1TB)</button>
+            <button class="section-link" id="home-upload-link">+ Subir audio</button>
+          </div>
         </div>
         <div id="home-tracks-list"></div>
       </section>
