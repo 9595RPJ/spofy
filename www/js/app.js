@@ -930,37 +930,49 @@ class SpofyApp {
         • <b>Álbum:</b> ${meta.album || '—'} · <b>Duración:</b> ${this.formatTime(this.detectedAudioDuration)}`;
     });
 
-    // Manual 1-Tap Google Drive 1 TB Folder Sync button
+    // Manual 1-Tap Google Drive 1 TB Folder Sync button (both on Home and in Upload tab)
+    const runDriveFolderSync = async (btnEl) => {
+      const origText = btnEl ? btnEl.textContent : '';
+      if (btnEl) {
+        btnEl.disabled = true;
+        btnEl.textContent = '🔄 Escaneando Drive...';
+      }
+      this.showToast('🔄 Escaneando tu carpeta de Google Drive (1 TB)...');
+      try {
+        const driveTracks = await window.storageEngine.fetchTracksFromGoogleDriveBridge();
+        if (!driveTracks.length) {
+          this.showToast('Tu carpeta de Drive está vacía por ahora. ¡Sube un .mp3 o .flac ahí!');
+        } else {
+          const existingIds = new Set(this.tracks.map((t) => t.id));
+          let added = 0;
+          driveTracks.forEach((dt) => {
+            if (!existingIds.has(dt.id)) {
+              this.tracks.unshift(dt);
+              added++;
+            }
+          });
+          this.queue = [...this.tracks];
+          this.saveLocalState();
+          await this.renderAll();
+          this.showToast(`¡${driveTracks.length} canciones de Drive sincronizadas (${added} nuevas)! 🎉`);
+        }
+      } catch (err) {
+        this.showToast(`Error al sincronizar Drive: ${err.message}`);
+      } finally {
+        if (btnEl) {
+          btnEl.disabled = false;
+          btnEl.textContent = origText;
+        }
+      }
+    };
+
     const syncDriveBtn = document.getElementById('btn-sync-gdrive-folder');
     if (syncDriveBtn) {
-      syncDriveBtn.addEventListener('click', async () => {
-        syncDriveBtn.disabled = true;
-        syncDriveBtn.textContent = '🔄 Escaneando carpeta de Google Drive...';
-        try {
-          const driveTracks = await window.storageEngine.fetchTracksFromGoogleDriveBridge();
-          if (!driveTracks.length) {
-            this.showToast('La carpeta de Drive está vacía por ahora. ¡Sube un .mp3 o .flac ahí!');
-          } else {
-            const existingIds = new Set(this.tracks.map((t) => t.id));
-            let added = 0;
-            driveTracks.forEach((dt) => {
-              if (!existingIds.has(dt.id)) {
-                this.tracks.unshift(dt);
-                added++;
-              }
-            });
-            this.queue = [...this.tracks];
-            this.saveLocalState();
-            await this.renderAll();
-            this.showToast(`¡${driveTracks.length} canciones de Drive sincronizadas (${added} nuevas)! 🎉`);
-          }
-        } catch (err) {
-          this.showToast(`Error al sincronizar Drive: ${err.message}`);
-        } finally {
-          syncDriveBtn.disabled = false;
-          syncDriveBtn.textContent = '🔄 Sincronizar canciones de mi Carpeta de Drive ahora';
-        }
-      });
+      syncDriveBtn.addEventListener('click', () => runDriveFolderSync(syncDriveBtn));
+    }
+    const homeSyncDriveBtn = document.getElementById('home-sync-drive-btn');
+    if (homeSyncDriveBtn) {
+      homeSyncDriveBtn.addEventListener('click', () => runDriveFolderSync(homeSyncDriveBtn));
     }
 
     document.getElementById('btn-submit-audio').addEventListener('click', async () => {
