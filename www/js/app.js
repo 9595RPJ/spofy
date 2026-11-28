@@ -1020,6 +1020,80 @@ class SpofyApp {
       homeSyncDriveBtn.addEventListener('click', () => runDriveFolderSync(homeSyncDriveBtn));
     }
 
+    // Public User Settings & Updates Modal (Top-left 3-dots button for ALL users!)
+    const userSettingsModal = document.getElementById('user-settings-modal');
+    const openUserSettingsBtn = document.getElementById('btn-open-user-settings');
+    const closeUserSettingsBtn = document.getElementById('btn-close-user-settings');
+
+    if (openUserSettingsBtn && userSettingsModal) {
+      openUserSettingsBtn.addEventListener('click', () => {
+        const personalInp = document.getElementById('user-personal-name');
+        if (personalInp) {
+          personalInp.value = window.storageEngine.config.userName || 'Jaasiel';
+        }
+        userSettingsModal.classList.add('open');
+      });
+    }
+    if (closeUserSettingsBtn && userSettingsModal) {
+      closeUserSettingsBtn.addEventListener('click', () => {
+        userSettingsModal.classList.remove('open');
+      });
+    }
+
+    const userSyncCatalogBtn = document.getElementById('btn-user-sync-catalog');
+    if (userSyncCatalogBtn) {
+      userSyncCatalogBtn.addEventListener('click', async () => {
+        userSyncCatalogBtn.disabled = true;
+        userSyncCatalogBtn.textContent = '🔄 Buscando canciones nuevas...';
+        try {
+          await this.syncFromSupabaseOnStartup();
+          this.queue = [...this.tracks];
+          await this.renderAll();
+          userSettingsModal.classList.remove('open');
+          this.showToast(`¡Catálogo actualizado (${this.tracks.length} canciones disponibles)! 🎵`);
+        } catch (err) {
+          this.showToast('Catálogo sincronizado');
+        } finally {
+          userSyncCatalogBtn.disabled = false;
+          userSyncCatalogBtn.textContent = '🔄 Buscar nuevas canciones ahora';
+        }
+      });
+    }
+
+    const userOtaBtn = document.getElementById('btn-user-ota-update');
+    if (userOtaBtn) {
+      userOtaBtn.addEventListener('click', async () => {
+        userOtaBtn.textContent = '✨ Descargando última versión...';
+        this.showToast('Aplicando última actualización de Spofy...');
+        try {
+          await this.syncFromSupabaseOnStartup();
+          if ('serviceWorker' in navigator) {
+            const regs = await navigator.serviceWorker.getRegistrations();
+            await Promise.all(regs.map((r) => r.update()));
+          }
+          if ('caches' in window) {
+            const keys = await caches.keys();
+            await Promise.all(keys.map((k) => caches.delete(k)));
+          }
+        } catch (_) {}
+        setTimeout(() => {
+          window.location.reload(true);
+        }, 400);
+      });
+    }
+
+    const savePersonalNameBtn = document.getElementById('btn-save-personal-name');
+    if (savePersonalNameBtn) {
+      savePersonalNameBtn.addEventListener('click', () => {
+        const personalInp = document.getElementById('user-personal-name');
+        const newName = (personalInp && personalInp.value.trim()) || 'Jaasiel';
+        window.storageEngine.saveCloudConfig({ userName: newName });
+        this.applyUserConfigToUI();
+        userSettingsModal.classList.remove('open');
+        this.showToast(`¡Saludo actualizado: Hola, ${newName}! ✨`);
+      });
+    }
+
     document.getElementById('btn-submit-audio').addEventListener('click', async () => {
       const fileInput = document.getElementById('audio-file-input');
       const gdriveInput = document.getElementById('audio-gdrive-link-input');
