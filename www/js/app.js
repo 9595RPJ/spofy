@@ -12,7 +12,7 @@ const DEFAULT_TRACKS = [
     category: 'Música',
     genre: 'Pop',
     duration: 226,
-    liked: true,
+    liked: false,
     provider: 'supabase',
     coverUrl: 'https://jmtdskkkximvhbtxgunp.supabase.co/storage/v1/object/public/audios/covers/junior_h_las_noches.jpg',
     audioUrl: 'https://jmtdskkkximvhbtxgunp.supabase.co/storage/v1/object/public/audios/tracks/junior_h_las_noches.flac'
@@ -100,17 +100,26 @@ class SpofyApp {
   async syncFromSupabaseOnStartup() {
     if (!window.storageEngine.config.supabaseUrl || !window.storageEngine.config.supabaseAnonKey) return;
     try {
+      // Remember which tracks the user explicitly liked on this device
+      const userLikedIds = new Set(JSON.parse(localStorage.getItem('spofy_user_liked_ids') || '[]'));
+
       const byId = new Map();
       // 1. Fetch tracks stored in Supabase table
       const remoteTracks = await window.storageEngine.fetchTracksFromSupabase();
       if (remoteTracks && remoteTracks.length) {
-        remoteTracks.forEach((rt) => byId.set(rt.id, rt));
+        remoteTracks.forEach((rt) => {
+          rt.liked = userLikedIds.has(rt.id);
+          byId.set(rt.id, rt);
+        });
       }
       // 2. Also auto-discover any tracks inside the user's 1 TB Google Drive Folder via the Secure Bridge
       try {
         const driveTracks = await window.storageEngine.fetchTracksFromGoogleDriveBridge();
         if (driveTracks && driveTracks.length) {
-          driveTracks.forEach((dt) => byId.set(dt.id, dt));
+          driveTracks.forEach((dt) => {
+            dt.liked = userLikedIds.has(dt.id);
+            byId.set(dt.id, dt);
+          });
         }
       } catch (driveErr) {
         console.warn('Drive folder startup check:', driveErr.message);
@@ -118,7 +127,10 @@ class SpofyApp {
 
       if (byId.size > 0) {
         this.tracks.forEach((lt) => {
-          if (!byId.has(lt.id)) byId.set(lt.id, lt);
+          if (!byId.has(lt.id)) {
+            lt.liked = userLikedIds.has(lt.id);
+            byId.set(lt.id, lt);
+          }
         });
         this.tracks = Array.from(byId.values());
         this.saveLocalState();
@@ -131,19 +143,25 @@ class SpofyApp {
   loadLocalState() {
     const savedTracks = localStorage.getItem('ritmo_tracks');
     const savedPlaylists = localStorage.getItem('ritmo_playlists');
+    const userLikedIds = new Set(JSON.parse(localStorage.getItem('spofy_user_liked_ids') || '[]'));
 
     const demoIds = new Set(['trk_1', 'trk_2', 'trk_3', 'trk_4', 'trk_5']);
     if (savedTracks) {
-      const parsed = JSON.parse(savedTracks).filter(
-        (t) => !demoIds.has(t.id) && !(t.audioUrl && t.audioUrl.includes('soundhelix.com'))
-      );
+      const parsed = JSON.parse(savedTracks)
+        .filter((t) => !demoIds.has(t.id) && !(t.audioUrl && t.audioUrl.includes('soundhelix.com')))
+        .map((t) => ({
+          ...t,
+          liked: userLikedIds.has(t.id),
+          audioUrl: (t.audioUrl || '').replace('http://jmtdskkkximvhbtxgunp.supabase.co/drive-bridge', 'https://jmtdskkkximvhbtxgunp.supabase.co/functions/v1/drive-bridge'),
+          coverUrl: (t.coverUrl || '').replace('http://jmtdskkkximvhbtxgunp.supabase.co/drive-bridge', 'https://jmtdskkkximvhbtxgunp.supabase.co/functions/v1/drive-bridge')
+        }));
       this.tracks = parsed.length ? parsed : [...DEFAULT_TRACKS];
     } else {
       this.tracks = [...DEFAULT_TRACKS];
     }
 
     if (!this.tracks.some((t) => t.id === 'trk_junior_h_las_noches')) {
-      this.tracks.unshift(DEFAULT_TRACKS[0]);
+      this.tracks.unshift({ ...DEFAULT_TRACKS[0], liked: userLikedIds.has('trk_junior_h_las_noches') });
     }
 
     this.playlists = savedPlaylists ? JSON.parse(savedPlaylists) : [];
@@ -168,6 +186,17 @@ class SpofyApp {
     const m = Math.floor(sec / 60);
     const s = Math.floor(sec % 60);
     return `${m}:${s < 10 ? '0' : ''}${s}`;
+  }
+
+  // Escape HTML characters like <3 in "DEPR</3$$ED MFKZ" so they never break the DOM or overlap cards!
+  escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
   }
 
   setBulbyExpression(exprPath) {
@@ -359,16 +388,19 @@ class SpofyApp {
       this.tracks.map(async (t) => {
         const cover = (await window.storageEngine.resolveCoverUrl(t.coverUrl)) || 'assets/app-icon.png';
         const isCurrent = t.id === currentId;
+        const safeTitle = this.escapeHtml(t.title);
+        const safeArtist = this.escapeHtml(t.artist);
+        const safeAlbum = t.album ? ` · ${this.escapeHtml(t.album)}` : '';
         return `
-        <div class="list-row" data-track-id="${t.id}">
+        <div class="list-row" data-track-id="${this.escapeHtml(t.id)}">
           <div class="list-row-left">
-            <img class="list-thumb" src="${cover}" alt="${t.title}" />
+            <img class="list-thumb" src="${this.escapeHtml(cover)}" alt="${safeTitle}" onerror="this.onerror=null;this.src='assets/app-icon.png';" />
             <div class="list-meta">
-              <div class="list-title ${isCurrent ? 'playing' : ''}">${t.title}</div>
-              <div class="list-sub">${t.artist}${t.album ? ` · ${t.album}` : ''} · ${this.formatTime(t.duration)}</div>
+              <div class="list-title ${isCurrent ? 'playing' : ''}">${safeTitle}</div>
+              <div class="list-sub">${safeArtist}${safeAlbum} · ${this.formatTime(t.duration)}</div>
             </div>
           </div>
-          <button class="icon-btn btn-row-like" data-like-id="${t.id}" style="color:${t.liked ? 'var(--accent-coral)' : 'var(--text-secondary)'}; font-size:18px;">
+          <button class="icon-btn btn-row-like" data-like-id="${this.escapeHtml(t.id)}" style="color:${t.liked ? 'var(--accent-coral)' : 'var(--text-secondary)'}; font-size:18px;">
             ${t.liked ? '♥' : '♡'}
           </button>
         </div>`;
@@ -399,6 +431,13 @@ class SpofyApp {
     const t = this.tracks.find((x) => x.id === trackId);
     if (!t) return;
     t.liked = !t.liked;
+
+    // Persist explicit user likes in spofy_user_liked_ids
+    const userLikedIds = new Set(JSON.parse(localStorage.getItem('spofy_user_liked_ids') || '[]'));
+    if (t.liked) userLikedIds.add(t.id);
+    else userLikedIds.delete(t.id);
+    localStorage.setItem('spofy_user_liked_ids', JSON.stringify(Array.from(userLikedIds)));
+
     this.saveLocalState();
     window.storageEngine.syncTrackToSupabase(t);
     this.updateLikeButtons();
@@ -476,16 +515,19 @@ class SpofyApp {
     const rows = await Promise.all(
       this.tracks.map(async (t) => {
         const cover = (await window.storageEngine.resolveCoverUrl(t.coverUrl)) || 'assets/app-icon.png';
+        const safeTitle = this.escapeHtml(t.title);
+        const safeArtist = this.escapeHtml(t.artist);
+        const safeAlbum = t.album ? ` · ${this.escapeHtml(t.album)}` : '';
         return `
-        <div class="list-row" data-lib-track="${t.id}">
+        <div class="list-row" data-lib-track="${this.escapeHtml(t.id)}">
           <div class="list-row-left">
-            <img class="list-thumb" src="${cover}" alt="${t.title}" />
+            <img class="list-thumb" src="${this.escapeHtml(cover)}" alt="${safeTitle}" onerror="this.onerror=null;this.src='assets/app-icon.png';" />
             <div class="list-meta">
-              <div class="list-title">${t.title}</div>
-              <div class="list-sub">${t.artist}${t.album ? ` · ${t.album}` : ''} · ${this.formatTime(t.duration)}</div>
+              <div class="list-title">${safeTitle}</div>
+              <div class="list-sub">${safeArtist}${safeAlbum} · ${this.formatTime(t.duration)}</div>
             </div>
           </div>
-          ${this.isListenerMode ? '' : `<button class="icon-btn btn-delete-track admin-only" data-del-id="${t.id}" title="Eliminar" style="color:var(--accent-coral);">🗑</button>`}
+          ${this.isListenerMode ? '' : `<button class="icon-btn btn-delete-track admin-only" data-del-id="${this.escapeHtml(t.id)}" title="Eliminar" style="color:var(--accent-coral);">🗑</button>`}
         </div>`;
       })
     );
@@ -530,13 +572,16 @@ class SpofyApp {
     const rows = await Promise.all(
       liked.map(async (t) => {
         const cover = (await window.storageEngine.resolveCoverUrl(t.coverUrl)) || 'assets/app-icon.png';
+        const safeTitle = this.escapeHtml(t.title);
+        const safeArtist = this.escapeHtml(t.artist);
+        const safeAlbum = this.escapeHtml(t.album || 'Spofy');
         return `
-        <div class="list-row" data-fav-id="${t.id}">
+        <div class="list-row" data-fav-id="${this.escapeHtml(t.id)}">
           <div class="list-row-left">
-            <img class="list-thumb" src="${cover}" alt="${t.title}" />
+            <img class="list-thumb" src="${this.escapeHtml(cover)}" alt="${safeTitle}" onerror="this.onerror=null;this.src='assets/app-icon.png';" />
             <div class="list-meta">
-              <div class="list-title">${t.title}</div>
-              <div class="list-sub">${t.artist} · ${t.album || 'Spofy'}</div>
+              <div class="list-title">${safeTitle}</div>
+              <div class="list-sub">${safeArtist} · ${safeAlbum}</div>
             </div>
           </div>
           <span style="color:var(--accent-coral); font-size:18px;">♥</span>
@@ -568,10 +613,10 @@ class SpofyApp {
       <div class="list-row" data-live-idx="${idx}">
         <div class="list-row-left">
           ${showRanks ? `<span class="rank-badge">#${t.rank || idx + 1}</span>` : ''}
-          <img class="list-thumb" src="${t.coverUrl || 'assets/app-icon.png'}" alt="${t.title}" />
+          <img class="list-thumb" src="${this.escapeHtml(t.coverUrl || 'assets/app-icon.png')}" alt="${this.escapeHtml(t.title)}" onerror="this.onerror=null;this.src='assets/app-icon.png';" />
           <div class="list-meta">
-            <div class="list-title">${t.title}</div>
-            <div class="list-sub">${t.artist} · ${t.releaseDate ? `📅 ${t.releaseDate}` : t.album || t.genre}</div>
+            <div class="list-title">${this.escapeHtml(t.title)}</div>
+            <div class="list-sub">${this.escapeHtml(t.artist)} · ${this.escapeHtml(t.releaseDate ? `📅 ${t.releaseDate}` : t.album || t.genre)}</div>
           </div>
         </div>
         <button class="play-circle-lime" style="width:32px; height:32px; font-size:12px;">▶</button>
@@ -1030,7 +1075,7 @@ class SpofyApp {
           blobId,
           coverUrl,
           duration,
-          liked: true,
+          liked: false,
           provider,
           createdAt: new Date().toISOString()
         };
