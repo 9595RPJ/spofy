@@ -153,7 +153,10 @@
 
         <div class="search-box">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#75A894" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <input type="text" id="search-input" placeholder="Buscar artistas, canciones o estrenos..." />
+          <input type="text" id="search-input" placeholder="Buscar o hablar con el micrófono..." />
+          <button class="mic-btn small" id="btn-search-mic" title="Buscar con tu voz">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+          </button>
           <button class="section-link" id="btn-search-online" style="font-size:11.5px;">🌐 Buscar</button>
         </div>
 
@@ -379,14 +382,17 @@
 
     <!-- ==================== FULL-SCREEN PLAYER (FOREST GREEN MOCKUP) ==================== -->
     <div class="full-player-modal" id="full-player-modal">
-      <div class="fp-header">
-        <button class="icon-btn" id="fp-close-btn">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="6 9 12 15 18 9"/></svg>
-        </button>
-        <span class="fp-context" id="fp-context-label">SPOFY MIX ✨</span>
-        <button class="icon-btn" id="fp-ask-bulby-track-btn" title="Preguntar a Bulby sobre este artista">
-          ⋯
-        </button>
+      <div id="fp-drag-zone">
+        <div class="fp-swipe-handle"></div>
+        <div class="fp-header">
+          <button class="icon-btn" id="fp-close-btn">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <span class="fp-context" id="fp-context-label">DESLIZA HACIA ABAJO PARA MINIMIZAR</span>
+          <button class="icon-btn" id="fp-ask-bulby-track-btn" title="Preguntar a Bulby sobre este artista">
+            ⋯
+          </button>
+        </div>
       </div>
 
       <div class="fp-cover-wrap">
@@ -468,9 +474,18 @@
 
         <div id="bulby-chat-tracks" style="max-height: 195px; overflow-y: auto; margin-bottom: 12px;"></div>
 
-        <div style="display:flex; gap: 8px;">
-          <input type="text" id="bulby-chat-input" class="form-input" placeholder="Ej. ¿Qué música nueva sacó Peso Pluma?" />
-          <button class="btn-primary-emerald" id="btn-send-bulby-chat" style="width: auto; padding: 0 18px;">Enviar</button>
+        <!-- Real-Time Voice Listening Banner -->
+        <div id="voice-live-banner" class="voice-live-banner">
+          <span id="voice-live-status">🎙️ Escuchando en tiempo real... habla ahora</span>
+          <button class="section-link" id="btn-stop-voice" style="color:#fff;">Detener</button>
+        </div>
+
+        <div style="display:flex; align-items:center; gap: 8px;">
+          <button class="mic-btn" id="btn-bulby-mic" title="Hablar con Bulby en tiempo real">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+          </button>
+          <input type="text" id="bulby-chat-input" class="form-input" placeholder="Escribe o toca 🎙️ para hablarle a Bulby..." />
+          <button class="btn-primary-emerald" id="btn-send-bulby-chat" style="width: auto; padding: 0 18px; height: 44px;">Enviar</button>
         </div>
       </div>
     </div>
