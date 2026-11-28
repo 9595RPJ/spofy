@@ -3,14 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <meta name="theme-color" content="#0a0a0c" />
+  <meta name="theme-color" content="#0B2E28" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
   <link rel="manifest" href="manifest.json" />
-  <title>Spofy</title>
+  <link rel="icon" type="image/png" href="assets/app-icon.png" />
+  <title>Spofy – Tu Asistente Musical</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&family=Poppins:wght@600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body class="listener-mode">
@@ -18,226 +19,226 @@
     <!-- Toast Notification -->
     <div id="toast" class="toast">Listo</div>
 
+    <!-- ==================== 00 SPLASH / WELCOME SCREEN ==================== -->
+    <div id="splash-overlay" class="splash-overlay">
+      <div style="margin-top: 8px;">
+        <div class="spofy-wave-logo">
+          <span style="height: 11px;"></span>
+          <span style="height: 20px;"></span>
+          <span style="height: 32px;"></span>
+          <span style="height: 18px;"></span>
+          <span style="height: 26px;"></span>
+          <span style="height: 12px;"></span>
+        </div>
+        <div class="spofy-brand-title">Spofy</div>
+        <div class="spofy-brand-sub">TU ASISTENTE MUSICAL</div>
+      </div>
+
+      <div class="splash-mascot-wrap">
+        <div class="splash-speech">
+          ✨ <b>¡Hola! Soy Bulby</b>, tu asistente musical. Te recomiendo música, consulto charts en vivo y me adapto a tu mood.
+        </div>
+        <img src="assets/bulby-main.png" alt="Bulby Mascot" class="splash-mascot-img" />
+      </div>
+
+      <div style="width: 100%; display: flex; flex-direction: column; align-items: center;">
+        <button class="btn-lime-start" id="btn-start-app">
+          <span>Comenzar</span>
+          <span>→</span>
+        </button>
+        <button class="splash-login-link" id="btn-splash-admin-login">Iniciar sesión</button>
+      </div>
+    </div>
+
     <!-- Scrollable Screens -->
     <main class="screen-container">
       <!-- ==================== 01 INICIO ==================== -->
       <section id="screen-home" class="screen active">
-        <header class="top-bar">
-          <div class="user-greeting">
-            <div class="avatar-circle" id="user-avatar-btn" title="Spofy">J</div>
-            <span class="greeting-text" id="greeting-name">Hola, Jaasiel</span>
+        <header class="home-hero-header">
+          <div class="home-greeting-box">
+            <h1 id="greeting-name">Hola,</h1>
+            <p>¿qué escuchamos hoy?</p>
           </div>
-          <div class="top-actions">
-            <button class="mode-toggle-btn admin-only" id="btn-lock-admin-mode" title="Salir del Modo Editor y volver a Vista de Usuario">
-              <span>🔒 Bloquear Editor</span>
+          <div style="display:flex; align-items:center; gap: 8px;">
+            <button class="pill admin-only" id="btn-lock-admin-mode" style="background: rgba(255,107,122,0.2); border-color: #FF6B7A; color:#fff; padding:6px 10px;">
+              🔒 Bloquear
             </button>
-            <button class="icon-btn admin-only" id="btn-open-upload-quick" title="Subir Audio">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <button class="pill admin-only" id="btn-open-upload-quick" style="padding:6px 10px;">
+              ⬆ Subir
             </button>
-            <button class="icon-btn admin-only" id="btn-cloud-settings" title="Nube y Almacenamiento">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            <button class="pill admin-only" id="btn-cloud-settings" style="padding:6px 10px;">
+              ☁️ Nube
             </button>
+            <div class="bulby-corner-btn" id="user-avatar-btn" title="Toca para hablar con Bulby (o 5 veces para Modo Editor)">
+              <img id="home-bulby-img" src="assets/bulby-sing.png" alt="Bulby" />
+              <span class="bulby-online-dot">Bulby ✨</span>
+            </div>
           </div>
         </header>
 
-        <h1 class="hero-title">Tu música, a tu ritmo</h1>
-
-        <!-- Filter Pills -->
-        <div class="pill-row" id="home-filter-pills">
-          <button class="pill active" data-filter="all">Para ti</button>
-          <button class="pill" data-filter="Música">Música</button>
-          <button class="pill" data-filter="Podcasts">Podcasts</button>
-        </div>
-
-        <!-- Featured Card: Tu mix de hoy -->
-        <div class="featured-card" id="featured-mix-card">
-          <img src="https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=900&q=80" alt="Tu mix de hoy" />
-          <div class="featured-overlay">
-            <span class="badge-red">HECHO PARA TI</span>
-            <h2 class="featured-title">Tu mix de hoy</h2>
-            <p class="featured-subtitle">Una selección a tu ritmo</p>
-            <button class="featured-play-btn" id="btn-play-featured" aria-label="Reproducir mix">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20 6 4"/></svg>
-            </button>
+        <!-- 3 Quick Tiles (Recomendado para ti | Tus favoritos | Explorar géneros) -->
+        <div class="quick-tiles-3">
+          <div class="quick-tile highlight" id="tile-recommended">
+            <div class="quick-tile-icon">▶</div>
+            <div class="quick-tile-title">Recomendado<br/>para ti</div>
+          </div>
+          <div class="quick-tile" id="tile-favorites">
+            <div class="quick-tile-icon">☆</div>
+            <div class="quick-tile-title">Tus<br/>favoritos</div>
+          </div>
+          <div class="quick-tile" id="tile-explore-genres">
+            <div class="quick-tile-icon">((•))</div>
+            <div class="quick-tile-title">Explorar<br/>géneros</div>
           </div>
         </div>
 
-        <!-- Vuelve a escuchar -->
-        <div class="section-header">
-          <h3 class="section-title">Vuelve a escuchar</h3>
-        </div>
-        <div class="cards-grid-2" id="home-recent-cards">
-          <!-- Populated dynamically -->
-        </div>
-
-        <!-- Descubre algo nuevo -->
-        <div class="discover-banner" id="discover-banner-btn">
-          <div class="discover-left">
-            <img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=300&q=80" alt="Descubre" />
-            <span class="discover-title">Descubre algo nuevo</span>
+        <!-- Bulby Live Assistant Banner (Charts & New Releases) -->
+        <div class="bulby-ask-banner" id="btn-open-bulby-chat">
+          <div class="bulby-ask-left">
+            <img src="assets/app-icon.png" alt="Bulby AI" />
+            <div class="bulby-ask-text">
+              <h4>Pregúntale a Bulby ✨</h4>
+              <p>Top México 🇲🇽, Top Mundial 🌍 o música nueva de cualquier artista</p>
+            </div>
           </div>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          <span style="font-size: 18px; color: var(--accent-lime); font-weight: 900;">→</span>
         </div>
 
-        <!-- Tus Audios y Canciones -->
+        <!-- Sugerencias de Spofy ✨ -->
         <div class="section-header">
-          <h3 class="section-title">Tus canciones y audios</h3>
+          <h3 class="section-title">Sugerencias de Spofy ✨</h3>
+          <button class="section-link" id="btn-open-mood-from-home">¿Cómo te sientes?</button>
+        </div>
+
+        <div id="spofy-suggestions-list">
+          <div class="suggestion-card" data-sug="estudio">
+            <div class="suggestion-left">
+              <img class="suggestion-thumb" src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80" alt="Energía para estudiar" />
+              <div>
+                <div class="suggestion-title">Energía<br/>para estudiar</div>
+                <div class="suggestion-sub">Concentración y ritmo</div>
+              </div>
+            </div>
+            <button class="play-circle-lime" aria-label="Play">▶</button>
+          </div>
+
+          <div class="suggestion-card" data-sug="relax">
+            <div class="suggestion-left">
+              <img class="suggestion-thumb" src="https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=400&q=80" alt="Relax y enfoque" />
+              <div>
+                <div class="suggestion-title">Relax<br/>y enfoque</div>
+                <div class="suggestion-sub">Sonidos suaves para tu mente</div>
+              </div>
+            </div>
+            <button class="play-circle-lime" aria-label="Play">▶</button>
+          </div>
+        </div>
+
+        <!-- Tus Canciones en Supabase -->
+        <div class="section-header" style="margin-top: 18px;">
+          <h3 class="section-title">Tu música en Spofy</h3>
           <button class="section-link admin-only" id="home-upload-link">+ Subir audio</button>
         </div>
         <div id="home-tracks-list"></div>
       </section>
 
-      <!-- ==================== 02 BUSCAR ==================== -->
+      <!-- ==================== 02 EXPLORAR (BUSCAR + TOP CHARTS EN VIVO) ==================== -->
       <section id="screen-search" class="screen">
-        <header class="top-bar">
-          <h1 class="hero-title" style="margin-bottom: 0;">Buscar</h1>
-          <div class="avatar-circle" id="search-avatar-btn">J</div>
+        <header class="section-header" style="margin-bottom: 14px;">
+          <h1 style="font-size: 25px; font-weight: 900;">Explorar</h1>
+          <div class="bulby-corner-btn" id="search-avatar-btn" style="width:48px; height:48px; border-radius:15px;">
+            <img src="assets/bulby-cool.png" alt="Bulby Cool" style="border-radius:11px;" />
+          </div>
         </header>
 
         <div class="search-box">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8e8e9a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <input type="text" id="search-input" placeholder="¿Qué quieres escuchar?" />
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8e8e9a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#75A894" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="search-input" placeholder="Buscar artistas, canciones o estrenos..." />
+          <button class="section-link" id="btn-search-online" style="font-size:11.5px;">🌐 Buscar</button>
         </div>
 
-        <div id="search-results-area" style="display: none; margin-bottom: 22px;">
+        <!-- Live Internet Charts & New Releases Tabs -->
+        <div class="pill-row" id="explore-mode-pills">
+          <button class="pill active" data-explore="genres">🎸 Géneros</button>
+          <button class="pill" data-explore="top_mx">🇲🇽 Top México</button>
+          <button class="pill" data-explore="top_global">🌍 Top Mundial</button>
+          <button class="pill" data-explore="new_releases">🆕 Estrenos</button>
+        </div>
+
+        <!-- Live Search / Chart Results Container -->
+        <div id="search-results-area" style="display: none; margin-bottom: 20px;">
           <div class="section-header">
-            <h3 class="section-title">Resultados</h3>
-            <button class="section-link" id="btn-clear-search">Limpiar</button>
+            <h3 class="section-title" id="search-results-heading">Resultados</h3>
+            <button class="section-link" id="btn-clear-search">Volver a géneros</button>
           </div>
           <div id="search-results-list"></div>
         </div>
 
-        <div class="section-header">
-          <h3 class="section-title">Explora tu música</h3>
+        <!-- 6 Genre Cards matching "Explorar" mockup -->
+        <div id="explore-genres-pane">
+          <div class="genre-grid-2" id="search-categories-grid">
+            <div class="genre-tile pop" data-genre="Pop">
+              <span class="genre-tile-title">Pop</span>
+              <span class="genre-tile-emoji">🎧</span>
+            </div>
+            <div class="genre-tile rock" data-genre="Rock">
+              <span class="genre-tile-title">Rock</span>
+              <span class="genre-tile-emoji">🎸</span>
+            </div>
+            <div class="genre-tile lofi" data-genre="Lo-fi">
+              <span class="genre-tile-title">Lo-fi</span>
+              <span class="genre-tile-emoji">☕</span>
+            </div>
+            <div class="genre-tile electro" data-genre="Electrónica">
+              <span class="genre-tile-title">Electrónica</span>
+              <span class="genre-tile-emoji">🎛️</span>
+            </div>
+            <div class="genre-tile hiphop" data-genre="Hip-Hop">
+              <span class="genre-tile-title">Hip-Hop</span>
+              <span class="genre-tile-emoji">🧢</span>
+            </div>
+            <div class="genre-tile clasica" data-genre="Clásica">
+              <span class="genre-tile-title">Clásica</span>
+              <span class="genre-tile-emoji">🎻</span>
+            </div>
+          </div>
         </div>
-        <div class="cards-grid-2" id="search-categories-grid">
-          <div class="category-card" data-genre="Rock">
-            <img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=600&q=80" alt="Rock" />
-            <div class="category-card-overlay"><span class="category-card-title">Rock</span></div>
-          </div>
-          <div class="category-card" data-genre="Pop">
-            <img src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=600&q=80" alt="Pop" />
-            <div class="category-card-overlay"><span class="category-card-title">Pop</span></div>
-          </div>
-          <div class="category-card" data-genre="Podcasts">
-            <img src="https://images.unsplash.com/photo-1590602847861-f357a9332bbc?auto=format&fit=crop&w=600&q=80" alt="Podcasts" />
-            <div class="category-card-overlay"><span class="category-card-title">Podcasts</span></div>
-          </div>
-          <div class="category-card" data-genre="Entrenar">
-            <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=600&q=80" alt="Para entrenar" />
-            <div class="category-card-overlay"><span class="category-card-title">Para<br/>entrenar</span></div>
-          </div>
-        </div>
-
-        <div class="section-header">
-          <h3 class="section-title">Búsquedas recientes</h3>
-        </div>
-        <div id="recent-searches-list"></div>
       </section>
 
-      <!-- ==================== 03 TU BIBLIOTECA ==================== -->
+      <!-- ==================== 03 TU BIBLIOTECA (PLAYLISTS DE SPOFY) ==================== -->
       <section id="screen-library" class="screen">
-        <header class="top-bar">
-          <h1 class="hero-title" style="margin-bottom: 0;">Tu biblioteca</h1>
-          <div class="top-actions">
-            <button class="icon-btn" id="lib-search-btn" title="Buscar en biblioteca">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            </button>
-            <button class="icon-btn" id="lib-add-btn" title="Crear o subir">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            </button>
-          </div>
+        <header class="section-header" style="margin-bottom: 14px;">
+          <h1 style="font-size: 24px; font-weight: 900;">Playlists de Spofy</h1>
+          <button class="pill" id="btn-toggle-create-drawer" style="padding: 6px 12px;">+ Crear</button>
         </header>
 
         <div class="pill-row" id="library-filter-pills">
-          <button class="pill active" data-lib="playlists">Playlists</button>
-          <button class="pill" data-lib="artists">Artistas</button>
-          <button class="pill" data-lib="albums">Álbumes</button>
-          <button class="pill" data-lib="tracks">Mis Audios</button>
+          <button class="pill active" data-lib="spofy_playlists">Playlists Spofy</button>
+          <button class="pill" data-lib="tracks">Tu Nube (Supabase)</button>
+          <button class="pill admin-only" data-lib="upload">⬆ Subir Audio</button>
         </div>
 
-        <div class="library-toolbar">
-          <span>↓↑ Recientes ⌄</span>
-          <div style="display:flex; gap:10px;">
-            <span>☰</span>
-            <span>⊞</span>
-          </div>
-        </div>
-
-        <!-- Tus me gusta Banner -->
-        <div class="liked-banner" id="liked-songs-banner">
-          <div class="liked-left">
-            <div class="heart-circle">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-            </div>
-            <div>
-              <div class="list-title">Tus me gusta</div>
-              <div class="list-sub" id="liked-count-subtitle">Tu colección favorita</div>
-            </div>
-          </div>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="9 18 15 12 9 6"/></svg>
-        </div>
-
-        <!-- Library List Container -->
-        <div id="library-list-container"></div>
-      </section>
-
-      <!-- ==================== 04 CREAR / SUBIR AUDIO ==================== -->
-      <section id="screen-create" class="screen">
-        <header class="top-bar">
-          <h1 class="hero-title" style="margin-bottom: 0;">Crear</h1>
-          <button class="section-link admin-only" id="btn-open-cloud-from-create">☁️ Configurar Nube</button>
-        </header>
-
-        <!-- Sub-mode selector: Crear Playlist (from mockup 04) OR Subir Audio -->
-        <div class="create-mode-tabs admin-only">
-          <button class="create-tab-btn active" id="tab-mode-playlist">Crear Playlist</button>
-          <button class="create-tab-btn" id="tab-mode-upload">Subir Audio (FLAC / MP3)</button>
-        </div>
-
-        <!-- FORM A: CREAR PLAYLIST (Exact match to 04 Crear mockup) -->
-        <div id="create-playlist-pane">
-          <h2 style="font-size: 19px; font-weight: 800; margin-bottom: 4px;">Hazla tuya</h2>
-          <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 10px;">Tu próxima playlist empieza aquí</p>
-
-          <label class="cover-dropzone" id="playlist-cover-label">
-            <input type="file" id="playlist-cover-input" accept="image/*" hidden />
-            <img id="playlist-cover-preview" style="display:none;" alt="Portada" />
-            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#e52535" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-            <span style="font-size: 13px; font-weight: 600; color: var(--text-secondary);">Añadir portada</span>
-          </label>
-
+        <!-- Collapsible Create Playlist Box -->
+        <div id="create-playlist-drawer" style="display:none; background: var(--bg-card); border: 1.5px solid var(--border-mint); border-radius: 20px; padding: 14px; margin-bottom: 16px;">
+          <h4 style="font-size: 15px; font-weight: 900; margin-bottom: 10px;">✨ Nueva Playlist Personal</h4>
           <div class="form-group">
-            <label class="form-label">Nombre de la playlist</label>
-            <input type="text" id="playlist-name-input" class="form-input" placeholder="Mi nueva playlist" />
+            <input type="text" id="playlist-name-input" class="form-input" placeholder="Nombre de tu playlist..." />
           </div>
-
-          <button type="button" class="add-tracks-btn" id="btn-pick-playlist-tracks">
-            <span class="plus-circle">+</span>
-            <span id="picked-tracks-label">Añadir canciones</span>
-          </button>
-
-          <div id="playlist-track-selector" style="display:none; max-height: 155px; overflow-y:auto; background: var(--bg-card); border-radius: 12px; padding: 8px; margin-bottom: 14px;"></div>
-
-          <div class="toggle-row">
-            <span>Invitar colaboradores</span>
-            <div class="switch" id="collab-switch"></div>
-          </div>
-
-          <button type="button" class="btn-primary-red" id="btn-submit-playlist">Crear playlist</button>
+          <button type="button" class="btn-primary-emerald" id="btn-submit-playlist">Guardar Playlist</button>
         </div>
 
-        <!-- FORM B: SUBIR AUDIO A LA NUBE / DISPOSITIVO -->
-        <div id="create-upload-pane" style="display: none;">
-          <h2 style="font-size: 19px; font-weight: 800; margin-bottom: 4px;">Sube tu propio audio</h2>
-          <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 10px;" id="upload-destination-label">Guardando en Nube / Memoria Offline</p>
+        <!-- Admin Upload Audio Pane (Only visible when unlocked with PIN 1234) -->
+        <div id="create-upload-pane" class="admin-only" style="display:none; background: var(--bg-card); border: 1.5px solid var(--border-mint); border-radius: 22px; padding: 16px; margin-bottom: 18px;">
+          <div class="section-header">
+            <h3 style="font-size: 16px; font-weight: 900;">☁️ Subir Audio a Supabase</h3>
+            <span id="upload-destination-label" style="font-size: 11px; color: var(--accent-lime);">Supabase Cloud</span>
+          </div>
 
-          <label class="cover-dropzone" id="audio-cover-label" style="width:150px; height:150px;">
+          <label class="cover-dropzone" id="audio-cover-label">
             <input type="file" id="audio-cover-input" accept="image/*" hidden />
             <img id="audio-cover-preview" style="display:none;" alt="Portada" />
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#e52535" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-            <span style="font-size: 12px; font-weight: 600; color: var(--text-secondary);">Portada del audio</span>
+            <span style="font-size: 26px;">🖼️</span>
+            <span style="font-size: 11.5px; font-weight: 800; color: var(--accent-cream);">Portada (Automática)</span>
           </label>
 
           <div class="form-group">
@@ -248,13 +249,13 @@
           <div id="audio-meta-detected-banner" class="meta-detected-card"></div>
 
           <div class="form-group">
-            <label class="form-label">Título de la canción o audio</label>
-            <input type="text" id="audio-title-input" class="form-input" placeholder="Se detecta automáticamente del archivo" />
+            <label class="form-label">Título</label>
+            <input type="text" id="audio-title-input" class="form-input" placeholder="Se detecta automáticamente" />
           </div>
 
           <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px;">
             <div class="form-group">
-              <label class="form-label">Artista / Autor</label>
+              <label class="form-label">Artista</label>
               <input type="text" id="audio-artist-input" class="form-input" placeholder="Ej. Junior H" />
             </div>
             <div class="form-group">
@@ -263,32 +264,74 @@
             </div>
           </div>
 
-          <div class="form-group">
-            <label class="form-label">Duración detectada</label>
-            <input type="text" id="audio-duration-display" class="form-input" readonly placeholder="0:00 (automático)" style="color: var(--text-secondary);" />
-          </div>
-
           <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px;">
             <div class="form-group">
-              <label class="form-label">Categoría</label>
-              <select id="audio-category-input" class="form-select">
-                <option value="Música">Música</option>
-                <option value="Podcasts">Podcasts</option>
-              </select>
+              <label class="form-label">Duración</label>
+              <input type="text" id="audio-duration-display" class="form-input" readonly placeholder="0:00" />
             </div>
             <div class="form-group">
               <label class="form-label">Género</label>
               <select id="audio-genre-input" class="form-select">
-                <option value="Rock">Rock</option>
                 <option value="Pop">Pop</option>
-                <option value="Podcasts">Podcasts</option>
-                <option value="Entrenar">Para entrenar</option>
+                <option value="Rock">Rock</option>
+                <option value="Lo-fi">Lo-fi</option>
+                <option value="Electrónica">Electrónica</option>
+                <option value="Hip-Hop">Hip-Hop</option>
+                <option value="Clásica">Clásica</option>
               </select>
             </div>
           </div>
 
-          <button type="button" class="btn-primary-red" id="btn-submit-audio">Subir y guardar audio</button>
+          <button type="button" class="btn-primary-emerald" id="btn-submit-audio">Subir y guardar en Supabase</button>
         </div>
+
+        <!-- Library List Container (Modo Estudio, Entrenamiento, Relax Total, Viaje en Ruta + User Tracks) -->
+        <div id="library-list-container"></div>
+      </section>
+
+      <!-- ==================== 04 FAVORITOS & ¿CÓMO TE SIENTES HOY? ==================== -->
+      <section id="screen-favorites" class="screen">
+        <div class="mood-header-box">
+          <img id="mood-bulby-img" src="assets/bulby-sing.png" alt="Bulby Mood" class="mood-bulby-avatar" />
+          <h1 style="font-size: 22px; font-weight: 900;">¿Cómo te sientes hoy?</h1>
+          <p id="mood-bulby-status" style="font-size: 12.5px; color: var(--accent-cream); margin-top: 3px;">
+            Elige tu mood y Bulby adaptará tu música ✨
+          </p>
+        </div>
+
+        <!-- 6 Mood Cards matching bottom-right mockup screen -->
+        <div class="mood-grid-6" id="mood-cards-grid">
+          <div class="mood-card" data-mood="energia" data-expr="assets/bulby-cool.png">
+            <span class="mood-icon" style="color:#8CE063;">⚡</span>
+            <span class="mood-label">Con energía</span>
+          </div>
+          <div class="mood-card" data-mood="feliz" data-expr="assets/bulby-love.png">
+            <span class="mood-icon" style="color:#FF6B7A;">❤️</span>
+            <span class="mood-label">Feliz</span>
+          </div>
+          <div class="mood-card" data-mood="relajado" data-expr="assets/bulby-sleep.png">
+            <span class="mood-icon" style="color:#B8E0CE;">☁️</span>
+            <span class="mood-label">Relajado</span>
+          </div>
+          <div class="mood-card" data-mood="tranquilo" data-expr="assets/bulby-sleep.png">
+            <span class="mood-icon" style="color:#FFD166;">🌙</span>
+            <span class="mood-label">Tranquilo</span>
+          </div>
+          <div class="mood-card" data-mood="enfocado" data-expr="assets/bulby-sing.png">
+            <span class="mood-icon" style="color:#57C7A3;">📖</span>
+            <span class="mood-label">Enfocado</span>
+          </div>
+          <div class="mood-card" data-mood="inspirado" data-expr="assets/bulby-cool.png">
+            <span class="mood-icon" style="color:#FFD166;">✨</span>
+            <span class="mood-label">Inspirado</span>
+          </div>
+        </div>
+
+        <div class="section-header">
+          <h3 class="section-title">Tus Favoritos ❤️</h3>
+          <span id="liked-count-subtitle" style="font-size: 12px; color: var(--text-secondary);">1 canción</span>
+        </div>
+        <div id="favorites-tracks-list"></div>
       </section>
     </main>
 
@@ -302,11 +345,11 @@
         </div>
       </div>
       <div class="mini-controls">
-        <button class="icon-btn" id="mini-like-btn" aria-label="Me gusta">
-          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+        <button class="icon-btn" id="mini-like-btn" aria-label="Favorito">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
         </button>
         <button class="icon-btn" id="mini-play-btn" aria-label="Reproducir o Pausar">
-          <svg id="mini-play-icon" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20 6 4"/></svg>
+          <svg id="mini-play-icon" width="23" height="23" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20 6 4"/></svg>
         </button>
       </div>
       <div class="mini-progress-bar">
@@ -314,40 +357,40 @@
       </div>
     </div>
 
-    <!-- ==================== BOTTOM NAVIGATION ==================== -->
+    <!-- ==================== BOTTOM NAVIGATION (Inicio | Buscar | Tu biblioteca | Favoritos) ==================== -->
     <nav class="bottom-nav">
       <button class="nav-item active" data-target="screen-home">
-        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V9.5z"/></svg>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V9.5z"/></svg>
         <span>Inicio</span>
       </button>
       <button class="nav-item" data-target="screen-search">
-        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         <span>Buscar</span>
       </button>
       <button class="nav-item" data-target="screen-library">
-        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5V4.5"/><path d="M9 19.5V4.5"/><path d="M14 4.5l6 15"/></svg>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="6" height="16" rx="1.5"/><rect x="12" y="4" width="8" height="16" rx="1.5"/></svg>
         <span>Tu biblioteca</span>
       </button>
-      <button class="nav-item" data-target="screen-create">
-        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        <span>Crear</span>
+      <button class="nav-item" data-target="screen-favorites">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+        <span>Favoritos</span>
       </button>
     </nav>
 
-    <!-- ==================== FULL-SCREEN PLAYER ==================== -->
+    <!-- ==================== FULL-SCREEN PLAYER (FOREST GREEN MOCKUP) ==================== -->
     <div class="full-player-modal" id="full-player-modal">
       <div class="fp-header">
         <button class="icon-btn" id="fp-close-btn">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="6 9 12 15 18 9"/></svg>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="6 9 12 15 18 9"/></svg>
         </button>
-        <span class="fp-context" id="fp-context-label">REPRODUCIENDO TU MÚSICA</span>
-        <button class="icon-btn" id="fp-add-to-playlist-btn" title="Añadir a Playlist">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        <span class="fp-context" id="fp-context-label">SPOFY MIX ✨</span>
+        <button class="icon-btn" id="fp-ask-bulby-track-btn" title="Preguntar a Bulby sobre este artista">
+          ⋯
         </button>
       </div>
 
       <div class="fp-cover-wrap">
-        <img id="fp-cover" src="https://jmtdskkkximvhbtxgunp.supabase.co/storage/v1/object/public/audios/covers/junior_h_las_noches.jpg" alt="Portada" />
+        <img id="fp-cover" src="assets/bulby-tree-cover.png" alt="Portada" />
       </div>
 
       <div>
@@ -355,10 +398,10 @@
           <div>
             <div class="fp-title" id="fp-title">LAS NOCHES</div>
             <div class="fp-artist" id="fp-artist">Junior H</div>
-            <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;" id="fp-album">$AD BOYZ 4 LIFE II</div>
+            <div style="font-size: 11.5px; color: var(--text-muted); margin-top: 2px;" id="fp-album">$AD BOYZ 4 LIFE II</div>
           </div>
           <button class="icon-btn" id="fp-like-btn">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
           </button>
         </div>
 
@@ -366,7 +409,7 @@
           <input type="range" id="fp-seek-slider" class="fp-range" min="0" max="100" value="0" />
           <div class="fp-times">
             <span id="fp-current-time">0:00</span>
-            <span id="fp-total-time">3:24</span>
+            <span id="fp-total-time">3:46</span>
           </div>
         </div>
 
@@ -395,6 +438,43 @@
       </div>
     </div>
 
+    <!-- ==================== BULBY ASSISTANT LIVE CHAT MODAL ==================== -->
+    <div class="modal-overlay" id="bulby-chat-modal">
+      <div class="modal-sheet">
+        <div class="section-header" style="margin-bottom: 10px;">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <img id="chat-bulby-avatar" src="assets/bulby-sing.png" alt="Bulby" style="width:44px; height:44px; border-radius:13px; border:1.5px solid var(--accent-mint);" />
+            <div>
+              <h3 class="section-title" style="font-size: 16px;">Bulby – Asistente Musical ✨</h3>
+              <span style="font-size: 11px; color: var(--accent-lime);">Conectado a Charts y Estrenos en vivo</span>
+            </div>
+          </div>
+          <button class="icon-btn" id="btn-close-bulby-chat">✕</button>
+        </div>
+
+        <!-- Quick Question Chips -->
+        <div class="pill-row" style="margin-bottom: 12px;">
+          <button class="pill bulby-quick-q" data-q="¿Cuáles son las canciones más sonadas en México?">🇲🇽 Top México</button>
+          <button class="pill bulby-quick-q" data-q="¿Cuál es el Top Mundial hoy?">🌍 Top Mundial</button>
+          <button class="pill bulby-quick-q" data-q="¿Qué música nueva sacó Junior H?">🆕 Estrenos Junior H</button>
+          <button class="pill bulby-quick-q" data-q="¿Qué música nueva sacó The Warning?">🎸 The Warning</button>
+        </div>
+
+        <div class="bulby-chat-messages" id="bulby-chat-messages">
+          <div class="chat-bubble bulby">
+            ¡Hola! Soy <b>Bulby</b> 🎧. Pregúntame por el <b>Top de México</b>, el <b>Top Mundial</b> o escribe el nombre de cualquier artista o grupo para decirte qué música nueva acaba de sacar.
+          </div>
+        </div>
+
+        <div id="bulby-chat-tracks" style="max-height: 195px; overflow-y: auto; margin-bottom: 12px;"></div>
+
+        <div style="display:flex; gap: 8px;">
+          <input type="text" id="bulby-chat-input" class="form-input" placeholder="Ej. ¿Qué música nueva sacó Peso Pluma?" />
+          <button class="btn-primary-emerald" id="btn-send-bulby-chat" style="width: auto; padding: 0 18px;">Enviar</button>
+        </div>
+      </div>
+    </div>
+
     <!-- ==================== CLOUD & MIGRATION SETTINGS MODAL ==================== -->
     <div class="modal-overlay" id="cloud-modal">
       <div class="modal-sheet">
@@ -402,51 +482,46 @@
           <h3 class="section-title">☁️ Nube, Supabase y Migración</h3>
           <button class="icon-btn" id="btn-close-cloud-modal">✕</button>
         </div>
-        <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 14px;">
-          Puedes empezar usando la memoria local o Supabase (1 GB gratis), y cambiar o migrar a Cloudinary (10+ GB gratis) cuando quieras sin perder tus canciones ni playlists.
-        </p>
 
         <div class="form-group">
-          <label class="form-label">Tu nombre en la app</label>
+          <label class="form-label">Tu nombre en Spofy</label>
           <input type="text" id="cfg-username" class="form-input" placeholder="Jaasiel" />
         </div>
 
         <div class="form-group">
-          <label class="form-label">Proveedor de Almacenamiento Activo</label>
+          <label class="form-label">Proveedor de Almacenamiento</label>
           <select id="cfg-provider" class="form-select">
-            <option value="local">📱 Memoria Local / Offline (Sin cuenta)</option>
             <option value="supabase">🟢 Supabase Storage + DB (1 GB Gratis)</option>
-            <option value="cloudinary_supabase">🚀 Híbrido: Supabase DB + Cloudinary (10+ GB Gratis)</option>
+            <option value="cloudinary_supabase">🚀 Híbrido: Supabase DB + Cloudinary (10+ GB)</option>
+            <option value="local">📱 Memoria Local / Offline</option>
           </select>
         </div>
 
-        <div id="cfg-supabase-box">
+        <div class="form-group">
+          <label class="form-label">Supabase Project URL</label>
+          <input type="text" id="cfg-sb-url" class="form-input" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Supabase Anon Key</label>
+          <input type="password" id="cfg-sb-key" class="form-input" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Bucket de Audio</label>
+          <input type="text" id="cfg-sb-bucket" class="form-input" value="audios" />
+        </div>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px;">
           <div class="form-group">
-            <label class="form-label">Supabase Project URL</label>
-            <input type="text" id="cfg-sb-url" class="form-input" placeholder="https://xxxx.supabase.co" />
+            <label class="form-label">Cloudinary Cloud Name</label>
+            <input type="text" id="cfg-cl-name" class="form-input" placeholder="Opcional (+10 GB)" />
           </div>
           <div class="form-group">
-            <label class="form-label">Supabase Anon Key (Public)</label>
-            <input type="password" id="cfg-sb-key" class="form-input" placeholder="eyJhbGciOiJIUzI1NiIs..." />
-          </div>
-          <div class="form-group">
-            <label class="form-label">Nombre del Bucket en Supabase Storage</label>
-            <input type="text" id="cfg-sb-bucket" class="form-input" value="audios" />
+            <label class="form-label">Upload Preset</label>
+            <input type="text" id="cfg-cl-preset" class="form-input" placeholder="Opcional" />
           </div>
         </div>
 
-        <div id="cfg-cloudinary-box">
-          <div class="form-group">
-            <label class="form-label">Cloudinary Cloud Name (Para ampliar a +10 GB)</label>
-            <input type="text" id="cfg-cl-name" class="form-input" placeholder="mi-cloud-name" />
-          </div>
-          <div class="form-group">
-            <label class="form-label">Cloudinary Unsigned Upload Preset</label>
-            <input type="text" id="cfg-cl-preset" class="form-input" placeholder="ml_default" />
-          </div>
-        </div>
-
-        <button class="btn-primary-red" id="btn-save-cloud-cfg" style="margin-bottom: 14px;">Guardar configuración</button>
+        <button class="btn-primary-emerald" id="btn-save-cloud-cfg" style="margin-bottom: 12px;">Guardar configuración</button>
 
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px;">
           <button class="pill" id="btn-export-catalog" style="text-align:center;">⬇ Exportar Respaldo</button>
@@ -458,26 +533,27 @@
       </div>
     </div>
 
-    <!-- ==================== SECRET ADMIN PIN MODAL ==================== -->
+    <!-- ==================== SECRET ADMIN PIN MODAL (1234) ==================== -->
     <div class="modal-overlay" id="pin-modal">
-      <div class="modal-sheet" style="max-width: 340px; margin: auto; border-radius: 24px; border: 1px solid rgba(229,37,53,0.35); padding: 22px 20px;">
+      <div class="modal-sheet" style="max-width: 340px; margin: auto; border-radius: 24px; border: 2px solid var(--accent-mint); padding: 22px 20px;">
         <div class="section-header" style="margin-bottom: 8px;">
-          <h3 class="section-title">🔐 Acceso Administrador</h3>
+          <h3 class="section-title">🔐 Modo Editor Spofy</h3>
           <button class="icon-btn" id="btn-close-pin-modal">✕</button>
         </div>
         <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 14px;">
-          Ingresa tu PIN secreto para activar el Modo Editor y subir o administrar canciones en Supabase.
+          Ingresa tu PIN secreto para desbloquear la subida de canciones a Supabase y ajustes de administrador.
         </p>
         <div class="form-group">
-          <input type="password" id="admin-pin-input" inputmode="numeric" maxlength="8" class="form-input" placeholder="••••" style="text-align: center; font-size: 22px; letter-spacing: 8px; font-weight: 800;" />
+          <input type="password" id="admin-pin-input" inputmode="numeric" maxlength="8" class="form-input" placeholder="••••" style="text-align: center; font-size: 22px; letter-spacing: 8px; font-weight: 900;" />
         </div>
-        <button class="btn-primary-red" id="btn-submit-pin">Desbloquear Modo Editor</button>
+        <button class="btn-primary-emerald" id="btn-submit-pin">Desbloquear Modo Editor</button>
       </div>
     </div>
   </div>
 
   <script src="js/metadata.js"></script>
   <script src="js/storage.js"></script>
+  <script src="js/bulby-assistant.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>
