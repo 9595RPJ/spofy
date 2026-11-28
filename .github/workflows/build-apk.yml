@@ -30,6 +30,17 @@ jobs:
           npx cap add android
           npx cap sync android
 
+      - name: Apply Custom Bulby App Icon to Android APK
+        run: |
+          for dir in android/app/src/main/res/mipmap-*; do
+            if [ -d "$dir" ]; then
+              cp -f www/assets/app-icon.png "$dir/ic_launcher.png" || true
+              cp -f www/assets/app-icon.png "$dir/ic_launcher_round.png" || true
+              cp -f www/assets/app-icon.png "$dir/ic_launcher_foreground.png" || true
+            fi
+          done
+          rm -rf android/app/src/main/res/mipmap-anydpi-v26 || true
+
       - name: Build Debug APK
         working-directory: ./android
         run: |
