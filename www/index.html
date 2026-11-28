@@ -54,25 +54,35 @@
     <main class="screen-container">
       <!-- ==================== 01 INICIO ==================== -->
       <section id="screen-home" class="screen active">
+        <div class="top-left-settings-row">
+          <button class="dots-menu-btn" id="btn-open-user-settings" title="Ajustes y Actualizaciones">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <circle cx="5" cy="12" r="2.2"/>
+              <circle cx="12" cy="12" r="2.2"/>
+              <circle cx="19" cy="12" r="2.2"/>
+            </svg>
+          </button>
+          <div style="display:flex; align-items:center; gap: 6px;">
+            <button class="pill admin-only" id="btn-lock-admin-mode" style="background: rgba(255,107,122,0.2); border-color: #FF6B7A; color:#fff; padding:5px 10px; font-size:11.5px;">
+              🔒 Bloquear
+            </button>
+            <button class="pill admin-only" id="btn-open-upload-quick" style="padding:5px 10px; font-size:11.5px;">
+              ⬆ Subir
+            </button>
+            <button class="pill admin-only" id="btn-cloud-settings" style="padding:5px 10px; font-size:11.5px;">
+              ☁️ Nube
+            </button>
+          </div>
+        </div>
+
         <header class="home-hero-header">
           <div class="home-greeting-box">
             <h1 id="greeting-name">Hola,</h1>
             <p>¿qué escuchamos hoy?</p>
           </div>
-          <div style="display:flex; align-items:center; gap: 8px;">
-            <button class="pill admin-only" id="btn-lock-admin-mode" style="background: rgba(255,107,122,0.2); border-color: #FF6B7A; color:#fff; padding:6px 10px;">
-              🔒 Bloquear
-            </button>
-            <button class="pill admin-only" id="btn-open-upload-quick" style="padding:6px 10px;">
-              ⬆ Subir
-            </button>
-            <button class="pill admin-only" id="btn-cloud-settings" style="padding:6px 10px;">
-              ☁️ Nube
-            </button>
-            <div class="bulby-corner-btn" id="user-avatar-btn" title="Toca para hablar con Bulby (o 5 veces para Modo Editor)">
-              <img id="home-bulby-img" src="assets/bulby-sing.png" alt="Bulby" />
-              <span class="bulby-online-dot">Bulby ✨</span>
-            </div>
+          <div class="bulby-corner-btn" id="user-avatar-btn" title="Toca para hablar con Bulby (o 5 veces para Modo Editor)">
+            <img id="home-bulby-img" src="assets/bulby-sing.png" alt="Bulby" />
+            <span class="bulby-online-dot">Bulby ✨</span>
           </div>
         </header>
 
@@ -570,6 +580,59 @@
         <button class="pill" id="btn-force-ota-update" style="width:100%; text-align:center; border-color: var(--accent-lime); color: var(--accent-lime);">
           🔄 Buscar y aplicar cambios de diseño en vivo (OTA)
         </button>
+      </div>
+    </div>
+
+    <!-- ==================== PUBLIC USER SETTINGS & UPDATES MODAL (3 DOTS TOP-LEFT) ==================== -->
+    <div class="modal-overlay" id="user-settings-modal">
+      <div class="modal-sheet">
+        <div class="section-header" style="margin-bottom: 12px;">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <img src="assets/app-icon.png" alt="Spofy" style="width:40px; height:40px; border-radius:12px; border:1.5px solid var(--accent-mint);" />
+            <div>
+              <h3 class="section-title" style="font-size: 17px;">⚙️ Ajustes y Actualizaciones</h3>
+              <span style="font-size: 11px; color: var(--accent-lime);">Spofy – Tu Asistente Musical</span>
+            </div>
+          </div>
+          <button class="icon-btn" id="btn-close-user-settings">✕</button>
+        </div>
+
+        <!-- 1. Update Songs / Catalog for all users -->
+        <div style="background: rgba(31, 182, 120, 0.16); border: 1.5px solid var(--accent-mint); border-radius: 18px; padding: 14px; margin-bottom: 14px;">
+          <h4 style="font-size: 14px; font-weight: 900; color: var(--accent-cream); margin-bottom: 4px;">
+            🎵 Actualizar catálogo de canciones
+          </h4>
+          <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 10px;">
+            Busca y descarga la lista más reciente de canciones y álbumes disponibles en la nube de Spofy.
+          </p>
+          <button type="button" class="btn-primary-emerald" id="btn-user-sync-catalog" style="padding: 11px; font-size: 13.5px;">
+            🔄 Buscar nuevas canciones ahora
+          </button>
+        </div>
+
+        <!-- 2. Update App Design & Functions (OTA) for all users -->
+        <div style="background: rgba(18, 64, 55, 0.85); border: 1.5px solid var(--border-mint); border-radius: 18px; padding: 14px; margin-bottom: 14px;">
+          <h4 style="font-size: 14px; font-weight: 900; color: var(--accent-cream); margin-bottom: 4px;">
+            📲 Actualizar aplicación Spofy
+          </h4>
+          <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 10px;">
+            Descarga las últimas mejoras de diseño, sonidos de Bulby y funciones nuevas sin tener que reinstalar el APK.
+          </p>
+          <button type="button" class="pill" id="btn-user-ota-update" style="width: 100%; text-align: center; padding: 11px; font-size: 13px; border-color: var(--accent-lime); color: var(--accent-lime);">
+            ✨ Buscar y aplicar actualización de la app
+          </button>
+        </div>
+
+        <!-- 3. Personalize User Name on their own device -->
+        <div class="form-group" style="margin-bottom: 10px;">
+          <label class="form-label">Tu nombre para el saludo ("Hola, ...")</label>
+          <div style="display:flex; gap:8px;">
+            <input type="text" id="user-personal-name" class="form-input" placeholder="Tu nombre" />
+            <button type="button" class="pill" id="btn-save-personal-name" style="padding: 0 16px; border-color: var(--accent-mint); color: var(--accent-cream);">
+              Guardar
+            </button>
+          </div>
+        </div>
       </div>
     </div>
 
