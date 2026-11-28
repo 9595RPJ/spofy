@@ -41,6 +41,7 @@ jobs:
           done
           rm -rf android/app/src/main/res/mipmap-anydpi-v26 || true
           sed -i 's/<uses-permission android:name="android.permission.INTERNET" \/>/<uses-permission android:name="android.permission.INTERNET" \/>\n    <uses-permission android:name="android.permission.RECORD_AUDIO" \/>\n    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" \/>/' android/app/src/main/AndroidManifest.xml || true
+          cp -f www/index.html android/app/src/main/assets/public/error.html || true
 
       - name: Build Debug APK
         working-directory: ./android
