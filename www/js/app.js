@@ -673,6 +673,7 @@ class SpofyApp {
 
     try {
       const res = await window.bulbyAssistant.askBulby(q, this.tracks);
+      window.bulbyAssistant.playBulbySound('reply');
       const exprMap = {
         sing: 'assets/bulby-sing.png',
         cool: 'assets/bulby-cool.png',
@@ -1041,11 +1042,21 @@ class SpofyApp {
 
     // Mini-Player & Full-Player Controls
     document.getElementById('mini-open-full').addEventListener('click', () => {
-      document.getElementById('full-player-modal').classList.add('open');
+      const modal = document.getElementById('full-player-modal');
+      modal.style.transform = '';
+      modal.classList.add('open');
     });
     document.getElementById('fp-close-btn').addEventListener('click', () => {
-      document.getElementById('full-player-modal').classList.remove('open');
+      const modal = document.getElementById('full-player-modal');
+      modal.style.transform = '';
+      modal.classList.remove('open');
     });
+
+    // Swipe-down from top gesture to minimize Full-Screen Player
+    this.initPlayerSwipeDownGesture();
+
+    // Real-time Microphone Voice Recognition for Bulby Chat & Search
+    this.initVoiceRecognition();
 
     document.getElementById('mini-play-btn').addEventListener('click', (e) => {
       e.stopPropagation();
@@ -1163,6 +1174,196 @@ class SpofyApp {
       };
       reader.readAsText(file);
     });
+  }
+
+  // ==================== SWIPE-DOWN TO MINIMIZE FULL PLAYER ====================
+  initPlayerSwipeDownGesture() {
+    const modal = document.getElementById('full-player-modal');
+    let startY = 0;
+    let currentDeltaY = 0;
+    let isDragging = false;
+
+    const onStart = (clientY, target) => {
+      // Do not hijack horizontal range sliders
+      if (target && (target.tagName === 'INPUT' || target.closest('#fp-seek-slider'))) return;
+      startY = clientY;
+      currentDeltaY = 0;
+      isDragging = true;
+    };
+
+    const onMove = (clientY) => {
+      if (!isDragging) return;
+      const delta = clientY - startY;
+      if (delta > 0) {
+        currentDeltaY = delta;
+        modal.classList.add('dragging');
+        modal.style.transform = `translateY(${delta}px)`;
+      }
+    };
+
+    const onEnd = () => {
+      if (!isDragging) return;
+      isDragging = false;
+      modal.classList.remove('dragging');
+      if (currentDeltaY > 95) {
+        // Minimize player smoothly
+        modal.style.transform = '';
+        modal.classList.remove('open');
+      } else {
+        // Snap back to open state
+        modal.style.transform = '';
+      }
+      currentDeltaY = 0;
+    };
+
+    // Touch events (Mobile Android APK)
+    modal.addEventListener('touchstart', (e) => {
+      if (e.touches.length === 1) onStart(e.touches[0].clientY, e.target);
+    }, { passive: true });
+
+    modal.addEventListener('touchmove', (e) => {
+      if (isDragging && e.touches.length === 1) onMove(e.touches[0].clientY);
+    }, { passive: true });
+
+    modal.addEventListener('touchend', onEnd);
+
+    // Mouse drag support (for testing on PC browser)
+    const dragZone = document.getElementById('fp-drag-zone');
+    if (dragZone) {
+      dragZone.addEventListener('mousedown', (e) => onStart(e.clientY, e.target));
+      window.addEventListener('mousemove', (e) => {
+        if (isDragging) onMove(e.clientY);
+      });
+      window.addEventListener('mouseup', onEnd);
+    }
+  }
+
+  // ==================== REAL-TIME VOICE RECOGNITION (MIC) ====================
+  initVoiceRecognition() {
+    const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const chatMicBtn = document.getElementById('btn-bulby-mic');
+    const searchMicBtn = document.getElementById('btn-search-mic');
+    const liveBanner = document.getElementById('voice-live-banner');
+    const liveStatus = document.getElementById('voice-live-status');
+    const stopVoiceBtn = document.getElementById('btn-stop-voice');
+
+    this.isListeningVoice = false;
+    this.activeVoiceTarget = 'chat'; // 'chat' | 'search'
+
+    if (!SpeechRec) {
+      const warnNoSpeech = () => this.showToast('Tu navegador no soporta reconocimiento de voz directo');
+      if (chatMicBtn) chatMicBtn.addEventListener('click', warnNoSpeech);
+      if (searchMicBtn) searchMicBtn.addEventListener('click', warnNoSpeech);
+      return;
+    }
+
+    this.recognition = new SpeechRec();
+    this.recognition.lang = 'es-MX';
+    this.recognition.interimResults = true;
+    this.recognition.continuous = false;
+
+    let latestTranscript = '';
+
+    const setMicUI = (listening) => {
+      this.isListeningVoice = listening;
+      if (chatMicBtn) chatMicBtn.classList.toggle('listening', listening && this.activeVoiceTarget === 'chat');
+      if (searchMicBtn) searchMicBtn.classList.toggle('listening', listening && this.activeVoiceTarget === 'search');
+      if (liveBanner) liveBanner.classList.toggle('active', listening && this.activeVoiceTarget === 'chat');
+    };
+
+    this.recognition.onstart = () => {
+      latestTranscript = '';
+      window.bulbyAssistant.playBulbySound('listen');
+      setMicUI(true);
+      if (liveStatus) liveStatus.textContent = '🎙️ Escuchando en tiempo real... habla ahora';
+    };
+
+    this.recognition.onresult = (event) => {
+      let interim = '';
+      let finalTxt = '';
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const txt = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          finalTxt += txt;
+        } else {
+          interim += txt;
+        }
+      }
+      latestTranscript = (finalTxt || interim).trim();
+
+      if (this.activeVoiceTarget === 'chat') {
+        const inp = document.getElementById('bulby-chat-input');
+        if (inp) inp.value = latestTranscript;
+        if (liveStatus) liveStatus.textContent = `🎙️ "${latestTranscript}"`;
+      } else {
+        const sInp = document.getElementById('search-input');
+        if (sInp) sInp.value = latestTranscript;
+      }
+
+      if (finalTxt.trim()) {
+        const queryToRun = finalTxt.trim();
+        setMicUI(false);
+        if (this.activeVoiceTarget === 'chat') {
+          document.getElementById('bulby-chat-input').value = '';
+          this.sendBulbyMessage(queryToRun);
+        } else {
+          this.performSearch(queryToRun, true);
+        }
+      }
+    };
+
+    this.recognition.onerror = (e) => {
+      setMicUI(false);
+      if (e.error === 'not-allowed') {
+        this.showToast('Permite el acceso al micrófono 🎙️');
+      }
+    };
+
+    this.recognition.onend = () => {
+      if (this.isListeningVoice && latestTranscript) {
+        const q = latestTranscript;
+        setMicUI(false);
+        if (this.activeVoiceTarget === 'chat') {
+          document.getElementById('bulby-chat-input').value = '';
+          this.sendBulbyMessage(q);
+        } else {
+          this.performSearch(q, true);
+        }
+      } else {
+        setMicUI(false);
+      }
+    };
+
+    const toggleMic = (targetMode) => {
+      if (this.isListeningVoice) {
+        this.recognition.stop();
+        setMicUI(false);
+        return;
+      }
+      this.activeVoiceTarget = targetMode;
+      // Pause music briefly while speaking so mic hears clearly
+      if (this.isPlaying) {
+        this.audio.pause();
+      }
+      try {
+        this.recognition.start();
+      } catch (e) {
+        console.warn(e);
+      }
+    };
+
+    if (chatMicBtn) {
+      chatMicBtn.addEventListener('click', () => toggleMic('chat'));
+    }
+    if (searchMicBtn) {
+      searchMicBtn.addEventListener('click', () => toggleMic('search'));
+    }
+    if (stopVoiceBtn) {
+      stopVoiceBtn.addEventListener('click', () => {
+        this.recognition.stop();
+        setMicUI(false);
+      });
+    }
   }
 
   applyUserConfigToUI() {
