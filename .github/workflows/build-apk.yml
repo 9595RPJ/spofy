@@ -30,16 +30,34 @@ jobs:
           npx cap add android
           npx cap sync android
 
-      - name: Apply Custom Bulby App Icon & Microphone Permission to Android APK
+      - name: Apply Full-Bleed Bulby Launcher Icon & Forest Background (No White Sheet)
         run: |
-          for dir in android/app/src/main/res/mipmap-*; do
-            if [ -d "$dir" ]; then
-              cp -f www/assets/app-icon.png "$dir/ic_launcher.png" || true
-              cp -f www/assets/app-icon.png "$dir/ic_launcher_round.png" || true
-              cp -f www/assets/app-icon.png "$dir/ic_launcher_foreground.png" || true
-            fi
-          done
+          # Remove vector adaptive XMLs that draw the default white background sheet
           rm -rf android/app/src/main/res/mipmap-anydpi-v26 || true
+          rm -f android/app/src/main/res/drawable/ic_launcher_background.xml || true
+          rm -f android/app/src/main/res/drawable/ic_launcher_foreground.xml || true
+          rm -f android/app/src/main/res/drawable-v24/ic_launcher_foreground.xml || true
+
+          # Replace ic_launcher_background color in values with Spofy forest green (#0B2E28)
+          cat << 'EOF' > android/app/src/main/res/values/ic_launcher_background.xml
+          <?xml version="1.0" encoding="utf-8"?>
+          <resources>
+              <color name="ic_launcher_background">#0B2E28</color>
+          </resources>
+          EOF
+
+          # Copy properly sized full-bleed Bulby PNG icons into every Android density folder
+          for pair in "mdpi:48" "hdpi:72" "xhdpi:96" "xxhdpi:144" "xxxhdpi:192"; do
+            density="${pair%%:*}"
+            size="${pair##*:}"
+            dir="android/app/src/main/res/mipmap-${density}"
+            mkdir -p "$dir"
+            cp -f "www/assets/icons/icon-${size}.png" "$dir/ic_launcher.png"
+            cp -f "www/assets/icons/icon-${size}.png" "$dir/ic_launcher_round.png"
+            cp -f "www/assets/icons/icon-${size}.png" "$dir/ic_launcher_foreground.png"
+          done
+
+          # Add RECORD_AUDIO permission & Offline error fallback
           sed -i 's/<uses-permission android:name="android.permission.INTERNET" \/>/<uses-permission android:name="android.permission.INTERNET" \/>\n    <uses-permission android:name="android.permission.RECORD_AUDIO" \/>\n    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" \/>/' android/app/src/main/AndroidManifest.xml || true
           cp -f www/index.html android/app/src/main/assets/public/error.html || true
 
