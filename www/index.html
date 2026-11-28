@@ -232,9 +232,23 @@
 
         <!-- Admin Upload Audio Pane (Only visible when unlocked with PIN 1234) -->
         <div id="create-upload-pane" class="admin-only" style="display:none; background: var(--bg-card); border: 1.5px solid var(--border-mint); border-radius: 22px; padding: 16px; margin-bottom: 18px;">
+          <!-- Google Drive 1 TB Folder Auto-Sync Card -->
+          <div style="background: rgba(31, 182, 120, 0.16); border: 1.5px solid var(--accent-lime); border-radius: 16px; padding: 12px; margin-bottom: 16px;">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom: 6px;">
+              <b style="font-size: 13.5px; color: var(--accent-cream);">📁 Google Drive (1 TB) – Puente Seguro</b>
+              <span style="font-size: 10.5px; background: var(--accent-emerald); padding: 2px 8px; border-radius: 99px; font-weight: 900;">CONECTADO</span>
+            </div>
+            <p style="font-size: 11.5px; color: var(--text-secondary); margin-bottom: 10px;">
+              Sube tus archivos <b>.flac</b> o <b>.mp3</b> a tu carpeta de Google Drive y toca sincronizar. Nadie verá tu cuenta de Drive.
+            </p>
+            <button type="button" class="btn-primary-emerald" id="btn-sync-gdrive-folder" style="padding: 10px; font-size: 13px;">
+              🔄 Sincronizar canciones de mi Carpeta de Drive ahora
+            </button>
+          </div>
+
           <div class="section-header">
-            <h3 style="font-size: 16px; font-weight: 900;">☁️ Subir Audio a Supabase</h3>
-            <span id="upload-destination-label" style="font-size: 11px; color: var(--accent-lime);">Supabase Cloud</span>
+            <h3 style="font-size: 16px; font-weight: 900;">☁️ Subir Archivo o Enlace de Drive</h3>
+            <span id="upload-destination-label" style="font-size: 11px; color: var(--accent-lime);">Supabase / Drive</span>
           </div>
 
           <label class="cover-dropzone" id="audio-cover-label">
@@ -245,8 +259,13 @@
           </label>
 
           <div class="form-group">
-            <label class="form-label">Archivo de audio (.flac, .mp3, .wav, .m4a, .ogg)</label>
+            <label class="form-label">Opción 1: Archivo desde tu dispositivo (.flac, .mp3, .wav)</label>
             <input type="file" id="audio-file-input" accept="audio/*,.flac,.mp3,.wav,.m4a,.ogg" class="form-input" />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Opción 2: O pega un enlace de archivo de Google Drive</label>
+            <input type="text" id="audio-gdrive-link-input" class="form-input" placeholder="https://drive.google.com/file/d/..." />
           </div>
 
           <div id="audio-meta-detected-banner" class="meta-detected-card"></div>
