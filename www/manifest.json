@@ -1,17 +1,17 @@
 {
-  "name": "Spofy",
+  "name": "Spofy – Tu Asistente Musical",
   "short_name": "Spofy",
-  "description": "Spofy - Tu música, a tu ritmo",
+  "description": "Spofy con Bulby: Tu asistente musical, reproductor en la nube y charts en vivo",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#0a0a0c",
-  "theme_color": "#e52535",
+  "background_color": "#0B2E28",
+  "theme_color": "#1FB678",
   "orientation": "portrait",
   "icons": [
     {
-      "src": "https://jmtdskkkximvhbtxgunp.supabase.co/storage/v1/object/public/audios/covers/junior_h_las_noches.jpg",
-      "sizes": "512x512",
-      "type": "image/jpeg",
+      "src": "assets/app-icon.png",
+      "sizes": "182x182",
+      "type": "image/png",
       "purpose": "any maskable"
     }
   ]
