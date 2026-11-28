@@ -228,6 +228,36 @@ html, body {
 }
 
 /* ==================== HOME SCREEN (01 INICIO) ==================== */
+.top-left-settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.dots-menu-btn {
+  background: rgba(18, 64, 55, 0.75);
+  border: 1.5px solid var(--border-mint);
+  color: var(--accent-cream);
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.dots-menu-btn:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--accent-lime);
+}
+
+.dots-menu-btn:active {
+  transform: scale(0.93);
+}
+
 .home-hero-header {
   display: flex;
   align-items: center;
